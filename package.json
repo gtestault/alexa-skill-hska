@@ -6,8 +6,6 @@
     "ask-sdk": "^2.10.0",
     "ask-sdk-express-adapter": "^2.10.0",
     "express": "^4.17.1",
-    "global": "^4.4.0",
-    "netlify-cli": "^2.65.7",
     "typescript": "^4.0.3"
   },
   "scripts": {
@@ -16,7 +14,7 @@
   "devDependencies": {
     "@types/express": "^4.17.8",
     "@types/node": "^14.11.10",
-    "nodemon": "^2.0.5",
+    "nodemon": "^2.0.6",
     "ts-node": "^9.0.0"
   }
 }
