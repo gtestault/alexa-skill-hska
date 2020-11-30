@@ -11,18 +11,17 @@ const CanteenIntentHandler = {
         let requestedDate = ""
         const request = handlerInput.requestEnvelope.request
         const slotValues = request.intent.slots
-        try {
-            mensaId = slotValues.SELECTED_CANTEEN.resolutions.resolutionsPerAuthority[0].values[0].value.id
-            requestedDate = slotValues.DATE.value
-        } catch (e) {
-            console.log(`~~~~ No matching: ${e}`);
+        const canteenResolutions = slotValues.SELECTED_CANTEEN.resolutions.resolutionsPerAuthority
+        if (!canteenResolutions || canteenResolutions.length === 0 || canteenResolutions[0].values.length === 0) {
+            throw Error("canteen intent: no canteen id was resolved")
+        }
+        mensaId = slotValues.SELECTED_CANTEEN.resolutions.resolutionsPerAuthority[0].values[0].value.id
+        requestedDate = slotValues.DATES.value
+        if (!requestedDate) {
+            throw Error("canteen intent: no date value was resolved")
         }
         let responseSpeach = ""
-        try {
-            responseSpeach = await getCanteenInfo(mensaId, requestedDate);
-        } catch (e) {
-            console.log(`~~~~ Exception: ${e}`);
-        }
+        responseSpeach = await getCanteenInfo(mensaId, requestedDate);
         console.log(`TEXT TO SPEAK: ${responseSpeach}`);
         return handlerInput.responseBuilder
             .speak(responseSpeach)
@@ -43,23 +42,31 @@ const getCanteenInfo = (mensaId, requestedDate) => {
                 body.push(chunk);
             });
             res.on('end', () => {
+                if (res.statusCode > 200) {
+                    throw new Error(`canteen intent: http client: received status code ${res.statusCode}`)
+                }
                 body = JSON.parse(Buffer.concat(body).toString());
-                console.log(`~~~~ Data received: ${JSON.stringify(body)}`);
+                if (!body || body.length === 0) {
+                   throw new Error(`canteen intent: http: client: unexpected response structure, received following data: ${body}`)
+                }
                 let canteen = body[0]
                 if (!isCanteenOpen(canteen)) {
                     responseSpeach = "Diese Mensa hat leider an diesem Tag zu."
                     resolve(responseSpeach)
                     return
                 }
-                const canteenName = body[0].name.replace("&", " und ");
-                const lineName = body[0].lines[0].name.replace("&", " und ");
+                const canteenName = canteen.name.replace("&", " und ");
+                if (!canteen.lines || canteen.lines.length === 0) {
+                   throw new Error("canteen intent: http client: unexpected canteen object structure: no lines on canteen object")
+                }
+                const lineName = canteen.lines[0].name.replace("&", " und ");
                 let meals = []
-                for (const meal of body[0].lines[0].meals) {
+                for (const meal of canteen.lines[0].meals) {
                     meals.push(meal.meal)
                 }
-                if (meals.length == 0) {
+                if (meals.length === 0) {
                     responseSpeach = "In der Mensa gibt es nichts zu essen."
-                } else if (meals.length == 1) {
+                } else if (meals.length === 1) {
                     responseSpeach = `In der Mensa gibt es auf der Linie ${lineName} heute folgendes zu essen: ${meals[0]}.`
                 } else {
                     responseSpeach = `In der Mensa gibt es auf der Linie ${lineName} heute folgendes zu essen:`
@@ -70,9 +77,7 @@ const getCanteenInfo = (mensaId, requestedDate) => {
                 resolve(responseSpeach)
             });
             res.on('error', (err) => {
-                console.log(`~~~~ Error in GET request: ${err}`);
-                responseSpeach = "Ich konnte die Mensa daten leider nicht laden. Versuche es bitte später nochmal."
-                resolve(responseSpeach)
+                throw err
             });
         });
         req.end()

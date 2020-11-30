@@ -4,7 +4,6 @@ module.exports = ErrorHandler = {
     },
     handle(handlerInput, error) {
         const request = handlerInput.requestEnvelope.request;
-
         console.log(`Error handled: ${error.message}`);
         // console.log(`Original Request was: ${JSON.stringify(request, null, 2)}`);
 
