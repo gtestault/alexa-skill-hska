@@ -1,7 +1,8 @@
 const Alexa = require("ask-sdk");
 const https = require("https");
 const CanteenIntent = require("./Features/Canteen/CanteenIntent")
-const NewsIntent = require("./Features/News/NewsIntent")
+//const NewsIntent = require("./Features/News/NewsIntent")
+const PersonIntent = require("./Features/Person/PersonIntent")
 
 // default intents
 const CancelIntent = require("./Default/intents/Cancel")
@@ -36,7 +37,8 @@ const customSkill = skillBuilder
         SessionEnded,
         //custom intents,
         CanteenIntent,
-        NewsIntent,
+        //NewsIntent,
+        PersonIntent
     )
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
