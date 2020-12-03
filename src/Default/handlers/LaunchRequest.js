@@ -9,7 +9,7 @@ module.exports = LaunchRequest_Handler = {
     handle(handlerInput) {
         const responseBuilder = handlerInput.responseBuilder;
 
-        let say = 'Hallo' + ' wilkommen zu der ' + invocationName + ' Alexa-App. Sage hilfe um Funktionen zu entdecken.';
+        let say = 'Willkommen zur ' + invocationName + ' Alexa-App.' // Sage hilfe um Funktionen zu entdecken.';
 
         let skillTitle = capitalize(invocationName);
 

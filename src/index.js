@@ -1,6 +1,7 @@
 const Alexa = require("ask-sdk");
 const https = require("https");
 const CanteenIntent = require("./Features/Canteen/CanteenIntent")
+const OpeningHoursIntent = require("./Features/OpeningHours/OpeningHoursIntent")
 
 // default intents
 const CancelIntent = require("./Default/intents/Cancel")
@@ -35,6 +36,7 @@ const customSkill = skillBuilder
         SessionEnded,
         //custom intents,
         CanteenIntent,
+        OpeningHoursIntent
     )
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
@@ -52,6 +54,7 @@ const customSkill = skillBuilder
 
 const express = require('express');
 const { ExpressAdapter } = require('ask-sdk-express-adapter');
+const OpeningHoursHandler = require("./Features/OpeningHours/OpeningHoursIntent");
 
 const app = express();
 const skill = skillBuilder.create();
