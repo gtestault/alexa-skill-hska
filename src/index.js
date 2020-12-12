@@ -3,6 +3,7 @@ const https = require("https");
 const CanteenIntent = require("./Features/Canteen/CanteenIntent")
 //const NewsIntent = require("./Features/News/NewsIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
+const LibraryIntent = require("./Features/Library/LibraryIntent")
 
 // default intents
 const CancelIntent = require("./Default/intents/Cancel")
@@ -20,7 +21,7 @@ const SessionEnded = require("./Default/handlers/SessionEnded")
 const InitMemoryAttributesInterceptor = require("./Default/interceptors/InitMemoryAttributes")
 const RequestHistoryInterceptor = require("./Default/interceptors/RequestHistory")
 
-const SERVER_PORT = 8000
+const SERVER_PORT = 8001
 
 const APP_ID = undefined;  // TODO replace with your Skill ID (OPTIONAL).
 
@@ -38,7 +39,8 @@ const customSkill = skillBuilder
         //custom intents,
         CanteenIntent,
         //NewsIntent,
-        PersonIntent
+        PersonIntent,
+        LibraryIntent,
     )
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
