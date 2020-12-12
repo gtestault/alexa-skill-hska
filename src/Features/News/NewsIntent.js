@@ -21,7 +21,7 @@ const NewsIntentHandler = {
         throw Error("news intent: no date value was resolved")
     }
     let responseSpeach = ""
-    responseSpeach = await getCanteenInfo(messageId, requestedDate);
+    responseSpeach = await getNewsInfo(messageId, requestedDate);
     console.log(`TEXT TO SPEAK: ${responseSpeach}`);
     return handlerInput.responseBuilder
         .speak(responseSpeach)
@@ -34,7 +34,7 @@ const NewsIntentHandler = {
 const getNewsInfo = (messageId, requestedDate) => {
     return new Promise((resolve, reject) => {
         let responseSpeach = "";
-        let requestURI = `https://www.iwi.hs-karlsruhe.de/hskampus-broker/api/news/since/?categoryId=3&updatedSince=${requestedDate}`;
+        let requestURI = `https://www.iwi.hs-karlsruhe.de/hskampus-broker/api/news/since/?categoryId=3&updatedSince=${requestedDate}`;  //categoryID: 3 steht für IWI //requestedDate: yyyy-mm-dd
         console.log(requestURI)
         const req = https.get(requestURI, function (res) {
             var body = [];
@@ -52,7 +52,7 @@ const getNewsInfo = (messageId, requestedDate) => {
                      responseSpeach = `Auf dem schwarzen Brett für ${facultyName} gibt es heute die folgende neue Meldung: ${news[0]}.`
                  } else {
                      responseSpeach = `Auf dem schwarzen Brett für ${facultyName} gibt es heute die folgenden neuen Meldungen:`
-                     for (const body.content of news) {
+                     for (const messageId.content of body) {
                          responseSpeach += " " + facultyName + ","
                      }
                  }
