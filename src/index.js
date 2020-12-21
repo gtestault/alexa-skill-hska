@@ -4,6 +4,7 @@ const CanteenIntent = require("./Features/Canteen/CanteenIntent")
 //const NewsIntent = require("./Features/News/NewsIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
 const LibraryIntent = require("./Features/Library/LibraryIntent")
+const LibraryPlaceIntent = require("./Features/Library/LibraryPlaceIntent")
 
 // default intents
 const CancelIntent = require("./Default/intents/Cancel")
@@ -41,6 +42,7 @@ const customSkill = skillBuilder
         //NewsIntent,
         PersonIntent,
         LibraryIntent,
+        LibraryPlaceIntent,
     )
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)

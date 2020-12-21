@@ -2,11 +2,11 @@ const Alexa = require("ask-sdk");
 const https = require("https");
 const utils = require("../../Default/utils/Utils.js")
 
-const LibraryIntentHandler = {
-    //identify the request for the right intent and return true, if it is libraryintent
+const LibraryPlaceIntentHandler = {
+    //identify the request for the right intent and return true, if it is LibraryPlaceIntent
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'LibraryIntent';
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'LibraryPlaceIntent';
     },
     async handle(handlerInput) {
         let bibID = ''
@@ -17,7 +17,7 @@ const LibraryIntentHandler = {
             //checks the slot value with the valid slot types
             if(utils.isSlotTypeValid(slotValues.bibliothek)) {
                 bibID = slotValues.bibliothek.resolutions.resolutionsPerAuthority[0].values[0].value.id
-                responseSpeech = await getFreeSeats(bibID);
+                responseSpeech = await getBuilding(bibID);
                 console.log("Bib: " + bibID);
             } else {
                 responseSpeech = "Die Bibliothek konnte nicht gefunden werden. Bitte wiederholen Sie Ihre Anfrage.";
@@ -33,7 +33,7 @@ const LibraryIntentHandler = {
     }
 };
 
-const getFreeSeats = (library) => {
+const getBuilding = (library) => {
     //promise = eventual completion of an asynchronous operation and its resulting value
     return new Promise((resolve, reject) => {
         let responseSpeech = "";
@@ -51,11 +51,11 @@ const getFreeSeats = (library) => {
                     console.log(`Data received: ${JSON.stringify(body)}`);
                     //take availableSeats of json structure
                     //go into location and then to availableSeats
-                    let totalSeats = body['location'][0]['availableSeats'];
+                    let buildingOfBib = body['location'][0]['building'];
                     let nameOfBib = body['location'][0]['longName'];
-                    let freeSeats = body['seatestimate'][1]['freeSeats'];
-                    console.log("Free seats: " + freeSeats);
-                    responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind " + freeSeats + " frei."
+                    let levelOfBib = body['location'][0]['level'];
+                    //console.log("Free seats: " + freeSeats);
+                    responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " in der " + levelOfBib + ". Etage."
                 } else {
                     responseSpeech = "Die " + nameOfBib + " konnte nicht gefunden werden oder der Eintrag ist nicht in der Datenbank. Bitte wiederholen Sie Ihre Anfrage.";
                 }
@@ -66,4 +66,4 @@ const getFreeSeats = (library) => {
     });
 }
 
-module.exports = LibraryIntentHandler
+module.exports = LibraryPlaceIntentHandler
