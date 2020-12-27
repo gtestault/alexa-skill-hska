@@ -164,6 +164,15 @@ module.exports = {
 
     },
 
+    emphasisSSML(text) {
+        return `<emphasis level="medium">${text}</emphasis>`
+    },
+
+    escapeForSSML(text) {
+        text.replace("&", " und ");
+        return text
+    },
+
     timeDelta(t1, t2) {
         const dt1 = new Date(t1);
         const dt2 = new Date(t2);

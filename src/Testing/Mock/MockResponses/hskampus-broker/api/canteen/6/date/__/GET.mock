@@ -1,0 +1,70 @@
+HTTP/1.1 200 OK
+Content-Type: text/json; charset=utf-8
+
+[
+  {
+    "name": "Schloss Gottesaue",
+    "id": 5695,
+    "planDate": 1578870000000,
+    "lines": [
+      {
+        "id": 25343,
+        "name": "Wahlessen 1",
+        "meals": [
+          {
+            "id": 78460,
+            "dish": "",
+            "additives": "[\"3\",\"Ge\",\"Se\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": true,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 2.5,
+            "price2": 5.5,
+            "price3": 5.5,
+            "price4": 2.9,
+            "meal": "Kalbsragout Gärtnerin Art"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25344,
+        "name": "Wahlessen 2",
+        "meals": [
+          {
+            "id": 78464,
+            "dish": "",
+            "additives": "[\"1\",\"Ei\",\"ML\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": true,
+            "priceFlag": 0,
+            "price1": 2.45,
+            "price2": 5.4,
+            "price3": 5.4,
+            "price4": 2.85,
+            "meal": "Cannelloni al Forno mit Ricotta - Spinat - Füllung"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      }
+    ]
+  }
+]

@@ -1,5 +1,9 @@
 const Alexa = require("ask-sdk");
 const https = require("https")
+const http = require("express/lib/request");
+const {emphasisSSML} = require("../../Default/utils/HelperFunctions");
+const {escapeForSSML} = require("../../Default/utils/HelperFunctions");
+const MockServerFactory = require("../../Testing/MockServer").init()
 
 const CanteenIntentHandler = {
     canHandle(handlerInput) {
@@ -30,13 +34,26 @@ const CanteenIntentHandler = {
     }
 };
 
+const getServerAddress = () => {
+    return MockServerFactory.getInstance().getServerAddress()
+}
 
-const getCanteenInfo = (mensaId, requestedDate) => {
+const getCanteenInfo = async (mensaId, requestedDate) => {
     return new Promise((resolve, reject) => {
         let responseSpeach = "";
-        let requestURI = `https://www.iwi.hs-karlsruhe.de/hskampus-broker/api/canteen/${mensaId}/date/${requestedDate}`;
+        let requestURI = `${getServerAddress()}/hskampus-broker/api/canteen/${mensaId}/date/${requestedDate}`;
         console.log(requestURI)
-        const req = https.get(requestURI, function (res) {
+        (async () => {
+            try {
+                const response = await got('https://sindresorhus.com');
+                console.log(response.body);
+                //=> '<!doctype html> ...'
+            } catch (error) {
+                console.log(error.response.body);
+                //=> 'Internal server error ...'
+            }
+        })();
+        const req = http.get(requestURI, function (res) {
             var body = [];
             res.on('data', function (chunk) {
                 body.push(chunk);
@@ -55,24 +72,18 @@ const getCanteenInfo = (mensaId, requestedDate) => {
                     resolve(responseSpeach)
                     return
                 }
-                const canteenName = canteen.name.replace("&", " und ");
+                const canteenName = escapeForSSML(canteen.name);
                 if (!canteen.lines || canteen.lines.length === 0) {
                    throw new Error("canteen intent: http client: unexpected canteen object structure: no lines on canteen object")
                 }
-                const lineName = canteen.lines[0].name.replace("&", " und ");
-                let meals = []
-                for (const meal of canteen.lines[0].meals) {
-                    meals.push(meal.meal)
-                }
-                if (meals.length === 0) {
-                    responseSpeach = "In der Mensa gibt es nichts zu essen."
-                } else if (meals.length === 1) {
-                    responseSpeach = `In der Mensa gibt es auf der Linie ${lineName} heute folgendes zu essen: ${meals[0]}.`
-                } else {
-                    responseSpeach = `In der Mensa gibt es auf der Linie ${lineName} heute folgendes zu essen:`
-                    for (const mealName of meals) {
-                        responseSpeach += " " + mealName + ","
+                responseSpeach += `In der Mensa ${canteenName} gibt es folgendes zu essen: `
+
+                for (let line of canteen.lines) {
+                    if (line.meals.length === 0) { //this should not happen
+                        continue
                     }
+                    const lineMeal = meals[0] // there is only one meal per line, so we read it directly
+                    responseSpeach += `${emphasisSSML(escapeForSSML(line.name) + ":" )} ${escapeForSSML(lineMeal.meal)} ${escapeForSSML(lineMeal.dish)}. `
                 }
                 resolve(responseSpeach)
             });
