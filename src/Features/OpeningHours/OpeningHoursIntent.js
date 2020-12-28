@@ -17,7 +17,7 @@ const weekdays = [
 const OpeningHoursHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'OpeningHoursIntent';
+            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'OpeningHoursIntent' || Alexa.getIntentName(handlerInput.requestEnvelope) === 'BuildingOpenedIntent');
     },
     async handle(handlerInput) {
         const request = handlerInput.requestEnvelope.request
@@ -28,29 +28,28 @@ const OpeningHoursHandler = {
         const poi = slotValues.poi.value
 
         const building = office ? office : poi;
+        const type = office ? 'offices' : 'generals';
 
+        let response;
         try {
-            poiObj = await getPOI(building);
+            poiObj = await getPOI(building, type);
+            response = await handleOpeningHoursIntent(poiObj, date);
         } catch (e) {
             console.log(`~~~~ No matching: ${e}`);
+            response = e;
         }
-        let responseSpeach = ""
-        try {
-            responseSpeach = doStuff(poiObj, date);
-        } catch (e) {
-            console.log(`~~~~ Exception: ${e}`);
-        }
-        console.log(`TEXT TO SPEAK: '${responseSpeach}'`);
+
+        console.log(`TEXT TO SPEAK: '${response}'`);
         return handlerInput.responseBuilder
-            .speak(responseSpeach)
+            .speak(response)
             //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
             .getResponse();
     }
 };
 
-const getPOI = (name) => {
-    return new Promise((resolve) => {
-        const uri = requestURI + 'poi/generals';
+const getPOI = (name, type) => {
+    return new Promise((resolve, reject) => {
+        const uri = requestURI + 'poi/' + type;
         const req = https.get(uri, (req, res) => {
             let body = [];
             req.on('data', (chunk) => {
@@ -64,7 +63,7 @@ const getPOI = (name) => {
                 if (found) {
                     resolve(found);
                 } else {
-                    resolve("Es konnten leider keine Informationen zu " + name + " gefunden werden.");
+                    reject("Es konnten leider keine Informationen zu " + name + " gefunden werden.");
                 }
             });
         });
@@ -72,63 +71,69 @@ const getPOI = (name) => {
 }
 
 
-function doStuff(date) {
-    const append = handleDate(date);
-    let newDate = new Date();
-    newDate.setDate(newDate.getDate(newDate) + append);
-    const convertedOpeningHours = convertOpeningHours(poi.openingHours);
-    
-    dayIndex= newDate.getDay()-1 == -1 ? 6 : newDate.getDay()-1;
+const handleOpeningHoursIntent = (poi, date) => {
+    return new Promise((resolve, reject) => {
+        const append = handleDate(date);
+        let newDate = new Date();
+        newDate.setDate(newDate.getDate(newDate) + append);
+        const convertedOpeningHours = convertOpeningHours(poi.openingHours, reject);
 
-    isOpened = convertedOpeningHours[dayIndex].Opens;
+        dayIndex = newDate.getDay() - 1 == -1 ? 6 : newDate.getDay() - 1;
 
-    let textAppend;
-    if(isOpened){
-    textAppend = " von " + convertedOpeningHours[dayIndex].Opens + " bis " + convertedOpeningHours[dayIndex].Closes + " Uhr geöffnet."
-    } else {
-    	textAppend = " nicht geöffnet";
-    }
-    return "Das Gebäude hat " + (date ? date : "heute") + textAppend;
+        isOpened = convertedOpeningHours[dayIndex].Opens;
+
+        let textAppend;
+        if (isOpened) {
+            textAppend = " von " + convertedOpeningHours[dayIndex].Opens + " bis " + convertedOpeningHours[dayIndex].Closes + " Uhr geöffnet."
+        } else {
+            textAppend = " nicht geöffnet";
+        }
+        resolve("Das " + poi.name + " hat " + (date ? date : "heute") + textAppend);
+    })
 }
 
-function convertOpeningHours(openingHours) {
-    const splitted = splitString(openingHours);
-    const convertedWeekdays = weekdays;
-    
-		for(let i = 0; i < splitted.length; i++){
-    
-    	// Is weekday
-    	if(!weekdays.find(x => splitted[i].includes(x.Short))){
-    		continue;
-    	}
-    
-    	isSequence = splitted[i+1] == "-";
+function convertOpeningHours(openingHours, reject) {
+    if (openingHours) {
+        const splitted = splitString(openingHours);
+        const convertedWeekdays = weekdays;
 
-    	if (isSequence) {
-        const sequenceEnd = splitted[i+2];
-        for (let index = 0; index < weekdays.length; index++) {
-            const obj = weekdays[index];
-            obj.Opens = splitted[i+3];
-            obj.Closes = splitted[i+5];
-            convertedWeekdays[index] = obj;
-            if (sequenceEnd.includes(weekdays[index].Short)) {
-                break;
+        for (let i = 0; i < splitted.length; i++) {
+
+            // Is weekday
+            if (!weekdays.find(x => splitted[i].includes(x.Short))) {
+                continue;
+            }
+
+            isSequence = splitted[i + 1] == "-";
+
+            if (isSequence) {
+                const sequenceEnd = splitted[i + 2];
+                for (let index = 0; index < weekdays.length; index++) {
+                    const obj = weekdays[index];
+                    obj.Opens = splitted[i + 3];
+                    obj.Closes = splitted[i + 5];
+                    convertedWeekdays[index] = obj;
+                    if (sequenceEnd.includes(weekdays[index].Short)) {
+                        break;
+                    }
+                }
+                i += 2;
+            } else {
+                let found = weekdays.find(x => splitted[i].includes(x.Short));
+                let index = weekdays.indexOf(found);
+
+                if (index >= 0) {
+                    const obj = weekdays[index];
+                    obj.Opens = splitted[i + 1];
+                    obj.Closes = splitted[i + 3];
+                    convertedWeekdays[index] = obj;
+                }
             }
         }
-        i += 2;
-     } else {
-     		let found = weekdays.find(x => splitted[i].includes(x.Short));
-        let index = weekdays.indexOf(found);
-
-     	   if (index >= 0) {
-            const obj = weekdays[index];
-            obj.Opens = splitted[i+1];
-            obj.Closes = splitted[i+3];
-            convertedWeekdays[index] = obj;
-        }  
-     }
+        return convertedWeekdays;
+    } else {
+        reject("Es konnten leider keine Öffnungszeiten ermittelt werden.");
     }
-    return convertedWeekdays;
 }
 
 function splitString(openingHours) {
@@ -172,7 +177,6 @@ const getCanteenInfo = (mensaId, requestedDate) => {
                     resolve(responseSpeach)
                     return
                 }
-                const canteenName = body[0].name.replace("&", " und ");
                 const lineName = body[0].lines[0].name.replace("&", " und ");
                 let meals = []
                 for (const meal of body[0].lines[0].meals) {
