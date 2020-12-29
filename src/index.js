@@ -1,8 +1,15 @@
 const Alexa = require("ask-sdk");
 const https = require("https");
 const CanteenIntent = require("./Features/Canteen/CanteenIntent")
-//const NewsIntent = require("./Features/News/NewsIntent")
+const NewsIntent = require("./Features/News/NewsIntent")
+const LibraryIntent = require("./Features/Library/LibraryIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
+const ScheduleNextIntent = require("./Features/Schedule/ScheduleNextIntent")
+const ScheduleTimeIntent = require("./Features/Schedule/ScheduleTimeIntent")
+const ScheduleDateIntent = require("./Features/Schedule/ScheduleDateIntent")
+const ScheduleRoomIntent = require("./Features/Schedule/ScheduleRoomIntent")
+const ScheduleLecturerIntent = require("./Features/Schedule/ScheduleLecturerIntent")
+
 
 // default intents
 const CancelIntent = require("./Default/intents/Cancel")
@@ -20,7 +27,7 @@ const SessionEnded = require("./Default/handlers/SessionEnded")
 const InitMemoryAttributesInterceptor = require("./Default/interceptors/InitMemoryAttributes")
 const RequestHistoryInterceptor = require("./Default/interceptors/RequestHistory")
 
-const SERVER_PORT = 8000
+const SERVER_PORT = 8003
 
 const APP_ID = undefined;  // TODO replace with your Skill ID (OPTIONAL).
 
@@ -37,7 +44,13 @@ const customSkill = skillBuilder
         SessionEnded,
         //custom intents,
         CanteenIntent,
-        //NewsIntent,
+        ScheduleTimeIntent,
+        ScheduleDateIntent,
+        ScheduleRoomIntent,
+        ScheduleNextIntent,
+        ScheduleLecturerIntent,
+        NewsIntent,
+        LibraryIntent,
         PersonIntent
     )
     .addErrorHandlers(ErrorHandler)
