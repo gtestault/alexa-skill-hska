@@ -1,6 +1,7 @@
 const Alexa = require("ask-sdk");
 const https = require("https")
 const http = require("express/lib/request");
+const got = require("got");
 const {emphasisSSML} = require("../../Default/utils/HelperFunctions");
 const {escapeForSSML} = require("../../Default/utils/HelperFunctions");
 const MockServerFactory = require("../../Testing/MockServer").init()
@@ -39,60 +40,35 @@ const getServerAddress = () => {
 }
 
 const getCanteenInfo = async (mensaId, requestedDate) => {
-    return new Promise((resolve, reject) => {
-        let responseSpeach = "";
-        let requestURI = `${getServerAddress()}/hskampus-broker/api/canteen/${mensaId}/date/${requestedDate}`;
-        console.log(requestURI)
-        (async () => {
-            try {
-                const response = await got('https://sindresorhus.com');
-                console.log(response.body);
-                //=> '<!doctype html> ...'
-            } catch (error) {
-                console.log(error.response.body);
-                //=> 'Internal server error ...'
-            }
-        })();
-        const req = http.get(requestURI, function (res) {
-            var body = [];
-            res.on('data', function (chunk) {
-                body.push(chunk);
-            });
-            res.on('end', () => {
-                if (res.statusCode > 200) {
-                    throw new Error(`canteen intent: http client: received status code ${res.statusCode}`)
-                }
-                body = JSON.parse(Buffer.concat(body).toString());
-                if (!body || body.length === 0) {
-                   throw new Error(`canteen intent: http: client: unexpected response structure, received following data: ${body}`)
-                }
-                let canteen = body[0]
-                if (!isCanteenOpen(canteen)) {
-                    responseSpeach = "Diese Mensa hat leider an diesem Tag zu."
-                    resolve(responseSpeach)
-                    return
-                }
-                const canteenName = escapeForSSML(canteen.name);
-                if (!canteen.lines || canteen.lines.length === 0) {
-                   throw new Error("canteen intent: http client: unexpected canteen object structure: no lines on canteen object")
-                }
-                responseSpeach += `In der Mensa ${canteenName} gibt es folgendes zu essen: `
+    let responseSpeach = "";
+    let requestURI = `${getServerAddress()}/hskampus-broker/api/canteen/${mensaId}/date/${requestedDate}`;
+    const res= await got(requestURI);
+    if (res.statusCode > 200) {
+        throw new Error(`canteen intent: http client: received status code ${res.statusCode}`)
+    }
+    const body = JSON.parse(res.body);
+    if (!body || body.length === 0) {
+        throw new Error(`canteen intent: http: client: unexpected response structure, received following data: ${body}`)
+    }
+    let canteen = body[0]
+    if (!isCanteenOpen(canteen)) {
+        responseSpeach = "Diese Mensa hat leider an diesem Tag zu."
+        return responseSpeach
+    }
+    const canteenName = escapeForSSML(canteen.name);
+    if (!canteen.lines || canteen.lines.length === 0) {
+        throw new Error("canteen intent: http client: unexpected canteen object structure: no lines on canteen object")
+    }
+    responseSpeach += `In der Mensa ${canteenName} gibt es folgendes zu essen: `
 
-                for (let line of canteen.lines) {
-                    if (line.meals.length === 0) { //this should not happen
-                        continue
-                    }
-                    const lineMeal = meals[0] // there is only one meal per line, so we read it directly
-                    responseSpeach += `${emphasisSSML(escapeForSSML(line.name) + ":" )} ${escapeForSSML(lineMeal.meal)} ${escapeForSSML(lineMeal.dish)}. `
-                }
-                resolve(responseSpeach)
-            });
-            res.on('error', (err) => {
-                throw err
-            });
-        });
-        req.end()
-    })
+    for (let line of canteen.lines) {
+        if (line.closed || line.meals.length === 0) { // skip lines with no meals
+            continue
+        }
+        const lineMeal = line.meals[0] // there is only one meal per line: we read it directly
+        responseSpeach += `${emphasisSSML(escapeForSSML(line.name) + ":")} ${escapeForSSML(lineMeal.meal)} ${escapeForSSML(lineMeal.dish)}. `
+    }
+    return responseSpeach
 }
 
 const isCanteenOpen = (canteen) => {

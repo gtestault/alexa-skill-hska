@@ -165,12 +165,11 @@ module.exports = {
     },
 
     emphasisSSML(text) {
-        return `<emphasis level="medium">${text}</emphasis>`
+        return `<emphasis level="moderate">${text}</emphasis>`
     },
 
     escapeForSSML(text) {
-        text.replace("&", " und ");
-        return text
+        return text.replace(/&/g, " und ");
     },
 
     timeDelta(t1, t2) {
