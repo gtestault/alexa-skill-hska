@@ -2,6 +2,7 @@ const Alexa = require("ask-sdk");
 const https = require("https");
 const CanteenIntent = require("./Features/Canteen/CanteenIntent")
 const OpeningHoursIntent = require("./Features/OpeningHours/OpeningHoursIntent")
+const BuildingOpenedIntent = require("./Features/OpeningHours/OpeningHoursIntent")
 //const NewsIntent = require("./Features/News/NewsIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
 
@@ -39,6 +40,7 @@ const customSkill = skillBuilder
         //custom intents,
         CanteenIntent,
         OpeningHoursIntent,
+        BuildingOpenedIntent,
         //NewsIntent,
         PersonIntent
     )

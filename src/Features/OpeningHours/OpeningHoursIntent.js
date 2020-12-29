@@ -1,5 +1,6 @@
 const Alexa = require("ask-sdk");
-const https = require("https")
+const https = require("https");
+const { off } = require("process");
 
 const requestURI = 'https://www.iwi.hs-karlsruhe.de/hskampus-broker/api/';
 const weekdays = [
@@ -10,7 +11,6 @@ const weekdays = [
     { Day: 'Freitag', Short: 'Fr' },
     { Day: 'Samstag', Short: 'Sa' },
     { Day: 'Sonntag', Short: 'So' },
-
 ];
 
 
@@ -20,20 +20,20 @@ const OpeningHoursHandler = {
             && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'OpeningHoursIntent' || Alexa.getIntentName(handlerInput.requestEnvelope) === 'BuildingOpenedIntent');
     },
     async handle(handlerInput) {
+        const isOpeningHoursIntent = Alexa.getIntentName(handlerInput.requestEnvelope) == 'OpeningHoursIntent';
+
         const request = handlerInput.requestEnvelope.request
         const slotValues = request.intent.slots;
 
-        const date = slotValues.date.value;
         const office = slotValues.office.value
-        const poi = slotValues.poi.value
-
-        const building = office ? office : poi;
+        const building = office ? slotValues.office.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : slotValues.poi.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value.id;
+        
         const type = office ? 'offices' : 'generals';
 
         let response;
         try {
             poiObj = await getPOI(building, type);
-            response = await handleOpeningHoursIntent(poiObj, date);
+            response = isOpeningHoursIntent ? await handleOpeningHours(poiObj) : await handleBuildingOpened(poiObj, slotValues.date.value);
         } catch (e) {
             console.log(`~~~~ No matching: ${e}`);
             response = e;
@@ -42,14 +42,13 @@ const OpeningHoursHandler = {
         console.log(`TEXT TO SPEAK: '${response}'`);
         return handlerInput.responseBuilder
             .speak(response)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
             .getResponse();
     }
 };
 
-const getPOI = (name, type) => {
+const getPOI = (building, type) => {
     return new Promise((resolve, reject) => {
-        const uri = requestURI + 'poi/' + type;
+        const uri = requestURI + 'poi/' + type + "/" + building.id;
         const req = https.get(uri, (req, res) => {
             let body = [];
             req.on('data', (chunk) => {
@@ -58,20 +57,61 @@ const getPOI = (name, type) => {
 
             req.on('end', () => {
                 body = JSON.parse(Buffer.concat(body).toString());
-                const found = body.find(x => x.name.toUpperCase() === name.toUpperCase());
-
-                if (found) {
-                    resolve(found);
+                console.log(body)
+                if (body) {
+                    resolve(body);
                 } else {
-                    reject("Es konnten leider keine Informationen zu " + name + " gefunden werden.");
+                    reject("Es konnten leider keine Informationen zu " + building.name + " gefunden werden.");
                 }
             });
         });
     });
 }
 
+const handleOpeningHours = (poi) => {
+    return new Promise((resolve, reject) => {
+        const convertedOpeningHours = convertOpeningHours(poi.openingHours, reject);
+        const prefix = "Das " + poi.name + " hat ";
+        let textArr = [];
+        let text = prefix;
+        for (var i = 0; i < convertedOpeningHours.length - 1; i++) {
+            let isSequence = false;
+            let start = convertedOpeningHours[i];
 
-const handleOpeningHoursIntent = (poi, date) => {
+            for (var j = i; j < convertedOpeningHours.length - 1; j++) {
+                let next = convertedOpeningHours[j + 1];
+                if (next && next.Opens === start.Opens && next.Closes === start.Closes) {
+                    isSequence = true;
+                } else {
+                    if (isSequence) {
+                        // Last day in sequence
+                        textArr.push(start.Day + " bis " + convertedOpeningHours[j].Day + " von "
+                            + start.Opens + " bis " + start.Closes + " Uhr");
+                    } else {
+                        // One day with unique opening hours
+                        textArr.push(start.Day + " von " + start.Opens + " bis " + start.Closes + " Uhr");
+                    }
+
+                    i = j;
+                    break;
+                }
+            }
+        }
+
+        for (var i = 0; i < textArr.length; i++) {
+            text += textArr[i];
+            if (textArr.length - 2 == i) {
+                text += ' und ';
+            } else if (i < textArr.length - 2) {
+                text += ', ';
+            }
+        }
+        resolve(text + " geöffnet");
+    })
+}
+
+
+const handleBuildingOpened = (poi, date) => {
     return new Promise((resolve, reject) => {
         const append = handleDate(date);
         let newDate = new Date();
@@ -157,122 +197,6 @@ function handleDate(date) {
             return 0;
     }
 }
-
-
-const getCanteenInfo = (mensaId, requestedDate) => {
-    return new Promise((resolve, reject) => {
-        let responseSpeach = "";
-        let requestURI = `https://www.iwi.hs-karlsruhe.de/hskampus-broker/api/canteen/${mensaId}/date/${requestedDate}`;
-        const req = https.get(requestURI, function (res) {
-            var body = [];
-            res.on('data', function (chunk) {
-                body.push(chunk);
-            });
-            res.on('end', () => {
-                body = JSON.parse(Buffer.concat(body).toString());
-                console.log(`~~~~ Data received: ${JSON.stringify(body)}`);
-                let canteen = body[0]
-                if (!isCanteenOpen(canteen)) {
-                    responseSpeach = "Diese Mensa hat leider an diesem Tag zu."
-                    resolve(responseSpeach)
-                    return
-                }
-                const lineName = body[0].lines[0].name.replace("&", " und ");
-                let meals = []
-                for (const meal of body[0].lines[0].meals) {
-                    meals.push(meal.meal)
-                }
-                if (meals.length == 0) {
-                    responseSpeach = "In der Mensa gibt es nichts zu essen."
-                } else if (meals.length == 1) {
-                    responseSpeach = `In der Mensa gibt es auf der Linie ${lineName} heute folgendes zu essen: ${meals[0]}.`
-                } else {
-                    responseSpeach = `In der Mensa gibt es auf der Linie ${lineName} heute folgendes zu essen:`
-                    for (const mealName of meals) {
-                        responseSpeach += " " + mealName + ","
-                    }
-                }
-                resolve(responseSpeach)
-            });
-            res.on('error', (err) => {
-                console.log(`~~~~ Error in GET request: ${err}`);
-                responseSpeach = "Ich konnte die Mensa daten leider nicht laden. Versuche es bitte später nochmal."
-                resolve(responseSpeach)
-            });
-        });
-        req.end()
-    })
-}
-
-const isCanteenOpen = (canteen) => {
-    for (const line of canteen.lines) {
-        if (!line.closed) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/*
-const CanteenIntent_Handler = {
-    canHandle(handlerInput) {
-        const request = handlerInput.requestEnvelope.request;
-        return request.type === 'IntentRequest' && request.intent.name === 'CanteenIntent';
-    },
-    handle(handlerInput) {
-        const request = handlerInput.requestEnvelope.request;
-        const responseBuilder = handlerInput.responseBuilder;
-        let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
- 
-        let say = 'Hello from CanteenIntent. ';
- 
-        let slotStatus = '';
-        let resolvedSlot;
- 
-        let slotValues = getSlotValues(request.intent.slots);
-        // getSlotValues returns .heardAs, .resolved, and .isValidated for each slot, according to request slot status codes ER_SUCCESS_MATCH, ER_SUCCESS_NO_MATCH, or traditional simple request slot without resolutions
- 
-        // console.log('***** slotValues: ' +  JSON.stringify(slotValues, null, 2));
-        //   SLOT: SELECTED_CANTEEEN
-        if (slotValues.SELECTED_CANTEEEN.heardAs) {
-            slotStatus += ' slot SELECTED_CANTEEEN was heard as ' + slotValues.SELECTED_CANTEEEN.heardAs + '. ';
-        } else {
-            slotStatus += 'slot SELECTED_CANTEEEN is empty. ';
-        }
-        if (slotValues.SELECTED_CANTEEEN.ERstatus === 'ER_SUCCESS_MATCH') {
-            slotStatus += 'a valid ';
-            if (slotValues.SELECTED_CANTEEEN.resolved !== slotValues.SELECTED_CANTEEEN.heardAs) {
-                slotStatus += 'synonym for ' + slotValues.SELECTED_CANTEEEN.resolved + '. ';
-            } else {
-                slotStatus += 'match. '
-            } // else {
-            //
-        }
-        if (slotValues.SELECTED_CANTEEEN.ERstatus === 'ER_SUCCESS_NO_MATCH') {
-            slotStatus += 'which did not match any slot value. ';
-            console.log('***** consider adding "' + slotValues.SELECTED_CANTEEEN.heardAs + '" to the custom slot type used by slot SELECTED_CANTEEEN! ');
-        }
- 
-        if ((slotValues.SELECTED_CANTEEEN.ERstatus === 'ER_SUCCESS_NO_MATCH') || (!slotValues.SELECTED_CANTEEEN.heardAs)) {
-            slotStatus += 'A few valid values are, ' + sayArray(getExampleSlotValues('CanteenIntent', 'SELECTED_CANTEEEN'), 'or');
-        }
- 
-        say += slotStatus;
- 
- 
-        return responseBuilder
-            .speak(say)
-            .reprompt('try again, ' + say)
-            .getResponse();
-    },
-};
-*/
-// 2. Constants ===========================================================================
-
-// Here you can define static data, to be used elsewhere in your code.  For example:
-//    const myString = "Hello World";
-//    const myArray  = [ "orange", "grape", "strawberry" ];
-//    const myObject = { "city": "Boston",  "state":"Massachusetts" };
 
 module.exports = OpeningHoursHandler
 
