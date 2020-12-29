@@ -11,6 +11,7 @@ const CanteenIntentHandler = {
         let requestedDate = ""
         const request = handlerInput.requestEnvelope.request
         const slotValues = request.intent.slots
+
         const canteenResolutions = slotValues.SELECTED_CANTEEN.resolutions.resolutionsPerAuthority
         if (!canteenResolutions || canteenResolutions.length === 0 || canteenResolutions[0].values.length === 0) {
             throw Error("canteen intent: no canteen id was resolved")
