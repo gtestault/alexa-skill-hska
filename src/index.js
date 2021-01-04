@@ -1,7 +1,6 @@
 const Alexa = require("ask-sdk");
 const https = require("https");
 const CanteenIntent = require("./Features/Canteen/CanteenIntent")
-const NewsIntent = require("./Features/News/NewsIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
 
 // default intents
@@ -10,6 +9,9 @@ const HelpIntent = require("./Default/intents/Help")
 const NavigateHomeIntent = require("./Default/intents/NavigateHome")
 const StopIntent = require("./Default/intents/Stop")
 const FallbackIntent = require("./Default/intents/Fallback")
+
+// news intents
+const {StartedInProgressNewsIntentHandler, ListNewsIntentHandler, NewsIntentHandler} = require("./Features/News/NewsIntent")
 
 // default handlers
 const LaunchRequest = require("./Default/handlers/LaunchRequest")
@@ -37,8 +39,11 @@ const customSkill = skillBuilder
         SessionEnded,
         //custom intents,
         CanteenIntent,
-        NewsIntent,
-        PersonIntent
+        PersonIntent,
+        //news intents
+        NewsIntentHandler,
+        ListNewsIntentHandler,
+        StartedInProgressNewsIntentHandler
     )
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
@@ -55,7 +60,7 @@ const customSkill = skillBuilder
     .create();
 
 const express = require('express');
-const { ExpressAdapter } = require('ask-sdk-express-adapter');
+const {ExpressAdapter} = require('ask-sdk-express-adapter');
 
 const app = express();
 const skill = skillBuilder.create();
