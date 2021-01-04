@@ -71,6 +71,7 @@ const getCanteenInfo = async (mensaId, requestedDate) => {
     return responseSpeach
 }
 
+// We consider a Canteen as closed, if all the lines of the canteen are closed.
 const isCanteenOpen = (canteen) => {
     for (const line of canteen.lines) {
         if (!line.closed) {
