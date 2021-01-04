@@ -3,6 +3,7 @@
 const Alexa = require("ask-sdk");
 const https = require("https")
 const utils = require("../../Default/utils/Utils")
+const got = require('got');
 
 
 const NewsIntentHandler = {
@@ -22,7 +23,7 @@ const NewsIntentHandler = {
         if (!newsResolutions || newsResolutions.length === 0 || newsResolutions[0].values.length === 0) {
             throw Error("news intent: no news id was resolved")
         }
-        courseOfStudiesId = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority[0].values[0].value.id
+        courseOfStudiesId = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority[0].values[0].value.name
         let requestedDate = slotValues.DATES.value
         if (!requestedDate) {
             throw Error("news intent: no date value was resolved")
@@ -42,6 +43,7 @@ const NewsIntentHandler = {
 const getNews = async (courseOfStudiesId, requestedDate) => {
     let responseSpeach = "";
     let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/newsbulletinboard/${courseOfStudiesId}`;
+    console.log(requestedDate)
     const res = await got(requestURI)
 
     if (res.statusCode > 200) {
@@ -50,31 +52,24 @@ const getNews = async (courseOfStudiesId, requestedDate) => {
 
     const body = JSON.parse(res.body);
 
-    let news = body[0];
+    let news = body;
     let publicationDate;
     //for (requestedDate === publicationDate in news) {}
 
+    relevantNews = news.filter(newsElement => newsElement.publicationDate === requestedDate)
 
-    if (!body || body.length === 0) {
-        responseSpeach = "Es gibt keine neuen Meldungen"
+    if (!relevantNews || relevantNews.length === 0) {
+        return "Es gibt keine neuen Meldungen"
     }
-    else if (body.length === 1) {
-        responseSpeach = `Es gibt eine neue Meldung mit dem Titel: ${news.title}`
-    }
-
 
     responseSpeach += `Es gibt neue Meldungen mit den folgenden Titeln:`
 
-    for (body.title in body) {
-        let i = 1;
-        responseSpeach = "Titel" + i + body.title
+    let i = 1;
+    for (const newsElement of relevantNews) {
+        responseSpeach += `<break time="1s"/> Meldung ${i}: ${newsElement.title}.`
         i++;
     }
-    // responseSpeach = `Bitte sage mir die Nummern der Meldungen die du hören möchtest.`
-
-
-
-
+    return responseSpeach
 }
 
 
