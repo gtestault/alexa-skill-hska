@@ -18,5 +18,17 @@
     "@types/node": "^14.11.10",
     "nodemon": "^2.0.6",
     "ts-node": "^9.0.0"
-  }
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gtestault/alexa-skill-hska.git"
+  },
+  "keywords": [],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/gtestault/alexa-skill-hska/issues"
+  },
+  "homepage": "https://github.com/gtestault/alexa-skill-hska#readme",
+  "description": ""
 }

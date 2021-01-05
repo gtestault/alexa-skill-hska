@@ -1,6 +1,6 @@
 const Alexa = require("ask-sdk");
 const https = require("https");
-const CanteenIntent = require("./Features/Canteen/CanteenIntent")
+const {CanteenIntentHandler, VegiCanteenIntentHandler} = require("./Features/Canteen/CanteenIntent")
 //const NewsIntent = require("./Features/News/NewsIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
 
@@ -36,7 +36,8 @@ const customSkill = skillBuilder
         LaunchRequest,
         SessionEnded,
         //custom intents,
-        CanteenIntent,
+        CanteenIntentHandler,
+        VegiCanteenIntentHandler,
         //NewsIntent,
         PersonIntent
     )
