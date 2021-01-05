@@ -54,7 +54,6 @@ const getBuilding = (library) => {
                     let buildingOfBib = body['location'][0]['building'];
                     let nameOfBib = body['location'][0]['longName'];
                     let levelOfBib = body['location'][0]['level'];
-                    //console.log("Free seats: " + freeSeats);
                     responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " in der " + levelOfBib + ". Etage."
                 } else {
                     responseSpeech = "Die " + nameOfBib + " konnte nicht gefunden werden oder der Eintrag ist nicht in der Datenbank. Bitte wiederholen Sie Ihre Anfrage.";
