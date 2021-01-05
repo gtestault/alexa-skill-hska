@@ -55,7 +55,11 @@ const getFreeSeats = (library) => {
                     let nameOfBib = body['location'][0]['longName'];
                     let freeSeats = body['seatestimate'][1]['freeSeats'];
                     console.log("Free seats: " + freeSeats);
-                    responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind " + freeSeats + " frei."
+                    if (freeSeats == 1) {
+                        responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon ist " + freeSeats + " frei."
+                    } else {
+                        responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind " + freeSeats + " frei."
+                    }
                 } else {
                     responseSpeech = "Die " + nameOfBib + " konnte nicht gefunden werden oder der Eintrag ist nicht in der Datenbank. Bitte wiederholen Sie Ihre Anfrage.";
                 }
