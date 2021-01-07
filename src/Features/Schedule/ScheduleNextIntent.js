@@ -23,7 +23,7 @@ const ScheduleNextIntentHandler = {
 
                 courseId = slotValues.course.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 semesterId = slotValues.semester.resolutions.resolutionsPerAuthority[0].values[0].value.id
-                if (slotValues.groups.resolutions.resolutionsPerAuthority[0].values[0].value.id !== "NONE") {
+                if (slotValues.groups.resolutions !== undefined) {
                     groupId = slotValues.groups.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 }
                 questionId = slotValues.wFrage.resolutions.resolutionsPerAuthority[0].values[0].value.id
@@ -53,7 +53,7 @@ const getScheduleInfo = (courseId, semesterId, groupsId, questionId) => {
     return new Promise((resolve, reject) => {
         let responseSpeach = "";
         let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/timetable/${courseId}/${groupsId}/${semesterId}`;
-        console.log(requestURI)
+    console.log(requestURI)
         const req = https.get(requestURI, function (res) {
             var body = [];
             res.on('data', function (chunk) {
@@ -62,22 +62,21 @@ const getScheduleInfo = (courseId, semesterId, groupsId, questionId) => {
             res.on('end', () => {
                 if (res.statusCode == 200) {
                     body = JSON.parse(Buffer.concat(body).toString());
-                    //console.log(`~~~~ Data received: ${JSON.stringify(body)}`);
+                    console.log(`~~~~ Data received: ${JSON.stringify(body)}`);
 
                     let i = 0
                     let n = 0
                     let found = false
                     const today = new Date()
                     const date = (today.getDay() + 6) % 7
-                    console.log(date)
+                console.log(date)
                     const time = today.getHours() * 60 + today.getMinutes()
 
                     while (n<8 && found == false) {
-                        console.log(n + " " + found + " " + i)
+                console.log(n + " " + found + " " + i)
                         if (n == 0 && body.timetables[date].entries[i] !== undefined) {
                             if (time > body.timetables[date].entries[i].startTime) {
                                 i++
-                                console.log("hier")
                             } else {
                                 found = true
                             }
@@ -87,7 +86,6 @@ const getScheduleInfo = (courseId, semesterId, groupsId, questionId) => {
                                 i = 0
                             } else {
                                 n++
-                                console.log("da")
                             }
                         } else {
                             n++
@@ -95,15 +93,12 @@ const getScheduleInfo = (courseId, semesterId, groupsId, questionId) => {
                                 found = true
                                 i = 0
                             }
-                            console.log("oder dort")
                         }
                     }
 
                     if (n<8) {
-
-                        //let day = utils.convertValueToDay(body.timetables[(date + n) % 7].entries[i].day)
                         let day = (date + n) % 7
-                        console.log(n + " " + day + " " + i)
+                    console.log(n + " " + day + " " + i)
                         let lectureName = body.timetables[day].entries[i].lectureName
                         let start = utils.convertValueToHour(body.timetables[day].entries[i].startTime)
                         let room = " statt"
@@ -116,7 +111,7 @@ const getScheduleInfo = (courseId, semesterId, groupsId, questionId) => {
                         }
                         let lecturer = body.timetables[day].entries[i].lecturerNames[0]
                         let lecturer2 = body.timetables[day].entries[i].lecturerNames[1]
-console.log(n + " " + day + " " + date + " " + questionId)
+                    console.log(n + " " + day + " " + date + " " + questionId)
                         if (questionId == 1) { // was
                             responseSpeach = "Die nächste Vorlesung ist " + lectureName
                         } else if (questionId == 2) { // wann

@@ -12,7 +12,7 @@ const ScheduleLecturerIntentHandler = {
         let groupId = 0
         let semesterId
         let lectureId
-        let requestedDate
+        let dateId
 
         const request = handlerInput.requestEnvelope.request
         const slotValues = request.intent.slots
@@ -24,15 +24,15 @@ const ScheduleLecturerIntentHandler = {
 
                 courseId = slotValues.course.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 semesterId = slotValues.semester.resolutions.resolutionsPerAuthority[0].values[0].value.id
-                if (slotValues.groups.resolutions.resolutionsPerAuthority[0].values[0].value.id !== "NONE") {
+                if (slotValues.groups.resolutions !== undefined) {
                     groupId = slotValues.groups.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 }
                 lectureId = slotValues.lecture.resolutions.resolutionsPerAuthority[0].values[0].value.name
-                requestedDate = slotValues.date.value
+                dateId =  slotValues.date.resolutions.resolutionsPerAuthority[0].values[0].value.id
 
-                responseSpeach = await getScheduleInfo(courseId, semesterId, groupId, lectureId, requestedDate);
+                responseSpeach = await getScheduleInfo(courseId, semesterId, groupId, lectureId, dateId);
 
-                console.log(courseId + " " + semesterId + ". Semester (Gruppe " + groupId + ") " + lectureId + ", " + requestedDate);
+                console.log(courseId + " " + semesterId + ". Semester (Gruppe " + groupId + ") " + lectureId + ", " + dateId);
             } else {
                 responseSpeach = "Der Studiengang konnte nicht gefunden werden. Bitte wiederholen Sie Ihre Anfrage.";
                 //throw error maybe?
@@ -75,12 +75,21 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId, date) => {
 
                     console.log("gesucht: " + lectureId)
 
+                    const today = new Date()
+                    if (date == 7) {            // heute
+                        date = (today.getDay() + 6) % 7
+                    } else if (date == 8) {     // morgen
+                        date = (today.getDay() + 7) % 7
+                    } else if (date == 9) {     // übermorgen
+                        date = (today.getDay() + 8) % 7
+                    }
+
                     while (n<7) {
                         if (body.timetables[n].entries[i] === undefined) {
                             n++
                             i=0
                         } else {
-                            if (lectureId == body.timetables[n].entries[i].lectureName && date == utils.convertValueToDay(body.timetables[n].entries[i].day).toLowerCase()){
+                            if (lectureId == body.timetables[n].entries[i].lectureName && date == body.timetables[n].entries[i].day){
                                 day = utils.convertValueToDay(body.timetables[n].entries[i].day)
                                 lecturer = body.timetables[n].entries[i].lecturerNames[0]
                                 lecturer2 = body.timetables[n].entries[i].lecturerNames[1]
@@ -98,7 +107,7 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId, date) => {
                         }
                     }
                     if(found == 0) {
-                        responseSpeach = "Am " + date + " findet " + lectureId + " nicht statt."
+                        responseSpeach = "Am " + utils.convertValueToDay(date) + " findet " + lectureId + " nicht statt."
                     } else {
                         responseSpeach = "Die Vorlesung " + lectureId + " findet " + responseSpeach + " statt"
                     }

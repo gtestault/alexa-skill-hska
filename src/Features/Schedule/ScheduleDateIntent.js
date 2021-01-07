@@ -12,7 +12,7 @@ const ScheduleDateIntentHandler = {
         let groupId = 0
         let semesterId
         let lectureId
-        let requestedDate
+        let dateId
 
         const request = handlerInput.requestEnvelope.request
         const slotValues = request.intent.slots
@@ -24,15 +24,15 @@ const ScheduleDateIntentHandler = {
 
                 courseId = slotValues.course.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 semesterId = slotValues.semester.resolutions.resolutionsPerAuthority[0].values[0].value.id
-                if (slotValues.groups.resolutions.resolutionsPerAuthority[0].values[0].value.id !== "NONE") {
+                if (slotValues.groups.resolutions !== undefined) {
                     groupId = slotValues.groups.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 }
                 lectureId = slotValues.lecture.resolutions.resolutionsPerAuthority[0].values[0].value.name
-                requestedDate = slotValues.date.value
+                dateId =  slotValues.date.resolutions.resolutionsPerAuthority[0].values[0].value.id
 
-                responseSpeach = await getScheduleInfo(courseId, semesterId, groupId, lectureId, requestedDate);
+                responseSpeach = await getScheduleInfo(courseId, semesterId, groupId, lectureId, dateId);
 
-                console.log(courseId + " " + semesterId + ". Semester (Gruppe " + groupId + ") " + lectureId + ", " + requestedDate);
+                console.log(courseId + " " + semesterId + ". Semester (Gruppe " + groupId + ") " + lectureId + ", " + dateId);
             } else {
                 responseSpeach = "Der Studiengang konnte nicht gefunden werden. Bitte wiederholen Sie Ihre Anfrage.";
                 //throw error maybe?
@@ -67,21 +67,30 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId, date) => {
                     //console.log(`~~~~ Data received: ${JSON.stringify(body)}`);
 
                     let i = 0
-                    //let n = 0
                     let start = ''
                     let found = 0
 
                     console.log("gesucht: " + lectureId)
 
-                    //while (n<7) {
-                        //if (body.timetables[n].entries[i] === undefined) {
-                            //n++
+                    const today = new Date()
+                    if (date == 7) {            // heute
+                        date = (today.getDay() + 6) % 7
+                    } else if (date == 8) {     // morgen
+                        date = (today.getDay() + 7) % 7
+                    } else if (date == 9) {     // übermorgen
+                        date = (today.getDay() + 8) % 7
+                    }
+
+                    let nextDate = new Date()
+                    nextDate.setDate(nextDate.getDate()+7) // + 1 Woche
+
                     while (body.timetables[date].entries[i] !== undefined) {
-                            //i=0
-                        //} else {
-                            //console.log("date " + date + " day " + utils.convertValueToDay(body.timetables[n].entries[i].day))
-                            //if (lectureId == body.timetables[n].entries[i].lectureName && date == utils.convertValueToDay(body.timetables[n].entries[i].day).toLowerCase()) {
                         if (lectureId == body.timetables[date].entries[i].lectureName) {
+
+                            const firstDate = new Date(body.timetables[date].entries[i].firstDate)
+                            firstDate.setHours(body.timetables[date].entries[i].startTime / 60, body.timetables[date].entries[i].startTime % 60 )
+
+                            if (!(body.timetables[date].entries[i].interval == "BLOCK" && (firstDate < today || nextDate < firstDate))) {
                                 start = utils.convertValueToHour(body.timetables[date].entries[i].startTime)
                                 if (found > 0){
                                     responseSpeach = responseSpeach + ", und "
@@ -89,13 +98,15 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId, date) => {
                                 found = found + 1
                                 responseSpeach = responseSpeach + " um " + start
                             }
-                            i++
+
                         }
-                    //}
+                        i++
+                    }
+
                     if(found == 0) {
-                        responseSpeach = "Am " + date + " findet " + lectureId + " nicht statt."
+                        responseSpeach = "Am " + utils.convertValueToDay(date) + " findet " + lectureId + " nicht statt."
                     } else {
-                        responseSpeach = "Die Vorlesung " + lectureId + " findet am " + date + responseSpeach + " statt"
+                        responseSpeach = "Die Vorlesung " + lectureId + " findet am " + utils.convertValueToDay(date) + responseSpeach + " statt"
                     }
 
                 } else {
