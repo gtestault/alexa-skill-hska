@@ -57,7 +57,11 @@ const getFreeSeats = (library) => {
                     console.log("Free seats: " + freeSeats);
                     if (freeSeats == 1) {
                         responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon ist " + freeSeats + " frei."
-                    } else {
+                    } else if (freeSeats == 0) {
+                        responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind keine Plätze frei."
+                    } else if (freeSeats == totalSeats) {
+                        responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind alle Plätze frei."
+                    }else {
                         responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind " + freeSeats + " frei."
                     }
                 } else {
