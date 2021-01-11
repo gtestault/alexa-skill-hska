@@ -54,7 +54,21 @@ const getBuilding = (library) => {
                     let buildingOfBib = body['location'][0]['building'];
                     let nameOfBib = body['location'][0]['longName'];
                     let levelOfBib = body['location'][0]['level'];
-                    responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " in der " + levelOfBib + ". Etage."
+                    if (levelOfBib == null) {
+                        responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib
+                    } else if (levelOfBib == 0) {
+                        responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " im Erdgeschoss."
+                    } else if (levelOfBib.includes("/")) {
+                        if (levelOfBib[0] == -1 && levelOfBib[2] == 0) {
+                            responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " im Untergeschoss und Erdgeschoss."
+                        } else if (levelOfBib[0] == 0 && levelOfBib[2] == 1) {
+                            responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " im Erdgeschoss und in der 1. Etage."
+                        } else if (levelOfBib[0] > 0 && levelOfBib[2] > 0) {
+                            responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " in der " + levelOfBib[0] + ". und " + levelOfBib[2] + ". Etage."
+                        }
+                    }else {
+                        responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " in der " + levelOfBib + ". Etage."
+                    }
                 } else {
                     responseSpeech = "Die " + nameOfBib + " konnte nicht gefunden werden oder der Eintrag ist nicht in der Datenbank. Bitte wiederholen Sie Ihre Anfrage.";
                 }
