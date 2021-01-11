@@ -20,7 +20,8 @@ const ScheduleDateIntentHandler = {
         let responseSpeach = ""
 
         try {
-            if (utils.isSlotTypeValid(slotValues.course)) {
+            if (utils.isSlotTypeValid(slotValues.course) && utils.isSlotTypeValid(slotValues.semester)
+                && utils.isSlotTypeValid(slotValues.lecture) && utils.isSlotTypeValid(slotValues.date)) {
 
                 courseId = slotValues.course.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 semesterId = slotValues.semester.resolutions.resolutionsPerAuthority[0].values[0].value.id
@@ -34,7 +35,7 @@ const ScheduleDateIntentHandler = {
 
                 console.log(courseId + " " + semesterId + ". Semester (Gruppe " + groupId + ") " + lectureId + ", " + dateId);
             } else {
-                responseSpeach = "Der Studiengang konnte nicht gefunden werden. Bitte wiederholen Sie Ihre Anfrage.";
+                responseSpeach = "Der Studiengang oder die Vorlesung konnten nicht gefunden werden. Bitte wiederholen Sie Ihre Anfrage.";
                 //throw error maybe?
             }
 
@@ -55,7 +56,7 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId, date) => {
     return new Promise((resolve, reject) => {
         let responseSpeach = "";
         let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/timetable/${courseId}/${groupsId}/${semesterId}`;
-        console.log(requestURI)
+        //console.log(requestURI)
         const req = https.get(requestURI, function (res) {
             var body = [];
             res.on('data', function (chunk) {

@@ -19,7 +19,8 @@ const ScheduleNextIntentHandler = {
         let responseSpeach = ""
 
         try {
-            if (utils.isSlotTypeValid(slotValues.course)) {
+            if (utils.isSlotTypeValid(slotValues.course) && utils.isSlotTypeValid(slotValues.semester)
+            && utils.isSlotTypeValid(slotValues.wFrage)) {
 
                 courseId = slotValues.course.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 semesterId = slotValues.semester.resolutions.resolutionsPerAuthority[0].values[0].value.id
@@ -62,72 +63,73 @@ const getScheduleInfo = (courseId, semesterId, groupsId, questionId) => {
             res.on('end', () => {
                 if (res.statusCode == 200) {
                     body = JSON.parse(Buffer.concat(body).toString());
-                    console.log(`~~~~ Data received: ${JSON.stringify(body)}`);
+                    //console.log(`~~~~ Data received: ${JSON.stringify(body)}`);
 
-                    let i = 0
+                    let i
                     let n = 0
                     let found = false
                     const today = new Date()
                     const date = (today.getDay() + 6) % 7
-                console.log(date)
                     const time = today.getHours() * 60 + today.getMinutes()
+                    let day
 
                     while (n<8 && found == false) {
-                console.log(n + " " + found + " " + i)
-                        if (n == 0 && body.timetables[date].entries[i] !== undefined) {
-                            if (time > body.timetables[date].entries[i].startTime) {
-                                i++
+                        day = (date + n) % 7
+                        i=0
+                        while (body.timetables[day].entries[i] !== undefined && found == false) {
+                            if (n == 0) {
+                                if (time > body.timetables[day].entries[i].startTime || body.timetables[day].entries[i].interval == "BLOCK") {
+                                    i++
+                                } else {
+                                    found = true
+                                }
                             } else {
-                                found = true
+                                if (body.timetables[day].entries[i].interval != "BLOCK") {
+                                    found = true
+                                } else {
+                                    i++
+                                }
                             }
-                        } else if (n == 7 && body.timetables[date].entries[0] !== undefined) {
-                            if (time > body.timetables[date].entries[0].startTime) {
-                                found = true
-                                i = 0
-                            } else {
-                                n++
-                            }
-                        } else {
+                        }
+                        if (found == false) {
                             n++
-                            if (body.timetables[(date+n) % 7].entries[0] !== undefined) {
-                                found = true
-                                i = 0
-                            }
                         }
                     }
 
+
                     if (n<8) {
-                        let day = (date + n) % 7
-                    console.log(n + " " + day + " " + i)
                         let lectureName = body.timetables[day].entries[i].lectureName
-                        let start = utils.convertValueToHour(body.timetables[day].entries[i].startTime)
-                        let room = " statt"
-                        if (body.timetables[day].entries[i].locations[0] !== undefined) {
-                            room = body.timetables[day].entries[i].locations[0].room + room
-                        }
-                        let building = "online "
-                        if (body.timetables[day].entries[i].locations[0] !== undefined) {
-                            building = "in " + body.timetables[day].entries[i].locations[0].building
-                        }
-                        let lecturer = body.timetables[day].entries[i].lecturerNames[0]
-                        let lecturer2 = body.timetables[day].entries[i].lecturerNames[1]
-                    console.log(n + " " + day + " " + date + " " + questionId)
+
                         if (questionId == 1) { // was
                             responseSpeach = "Die nächste Vorlesung ist " + lectureName
-                        } else if (questionId == 2) { // wann
+                        }
+                        else if (questionId == 2) { // wann
+                            let start = utils.convertValueToHour(body.timetables[day].entries[i].startTime)
                             if (day == date && n == 0) {
-                                responseSpeach = " heute "
+                                responseSpeach = " heute"
                             } else if ((date + 1) % 7 == day) {
-                                responseSpeach = " morgen "
+                                responseSpeach = " morgen"
                             } else if (day == date && n == 7) {
                                 responseSpeach = " nächsten " + utils.convertValueToDay(day)
                             } else {
                                 responseSpeach = " am " + utils.convertValueToDay(day)
                             }
-                            responseSpeach = "Die nächste Vorlesung ist" + responseSpeach + " um " + start
-                        } else if (questionId == 3) { // wo
+                            responseSpeach = "Die nächste Vorlesung " + lectureName + " ist" + responseSpeach + " um " + start
+                        }
+                        else if (questionId == 3) { // wo
+                            let room = " statt"
+                            if (body.timetables[day].entries[i].locations[0] !== undefined) {
+                                room = body.timetables[day].entries[i].locations[0].room + room
+                            }
+                            let building = "online "
+                            if (body.timetables[day].entries[i].locations[0] !== undefined) {
+                                building = "in " + body.timetables[day].entries[i].locations[0].building
+                            }
                             responseSpeach = "Die nächste Vorlesung " + lectureName + " findet " + building + room
-                        } else { // bei wem
+                        }
+                        else { // bei wem
+                            let lecturer = body.timetables[day].entries[i].lecturerNames[0]
+                            let lecturer2 = body.timetables[day].entries[i].lecturerNames[1]
                             responseSpeach = "Die nächste Vorlesung " + lectureName + " findet bei " + lecturer
                             if (lecturer2 !== undefined) {
                                 responseSpeach = resonseSpeach + " und bei " + lecturer2
