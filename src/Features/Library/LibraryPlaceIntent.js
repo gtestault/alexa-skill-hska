@@ -68,7 +68,7 @@ const getBuilding = (library) => {
                         } else if (firstLevelOfBib > 0 && secondLevelOfBib > 0) {
                             responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " in der " + firstLevelOfBib + ". und " + secondLevelOfBib + ". Etage."
                         }
-                    }else {
+                    } else {
                         responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " in der " + levelOfBib + ". Etage."
                     }
                 } else {
