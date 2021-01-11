@@ -19,7 +19,8 @@ const ScheduleTimeIntentHandler = {
         let responseSpeach = ""
 
         try {
-            if (utils.isSlotTypeValid(slotValues.course)) {
+            if (utils.isSlotTypeValid(slotValues.course) && utils.isSlotTypeValid(slotValues.semester)
+                && utils.isSlotTypeValid(slotValues.lecture)) {
 
                 courseId = slotValues.course.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 semesterId = slotValues.semester.resolutions.resolutionsPerAuthority[0].values[0].value.id
@@ -32,7 +33,7 @@ const ScheduleTimeIntentHandler = {
 
                 console.log("Studiengang: " + courseId + " Semester: " + semesterId + " Gruppe: " + groupId + " Vorlesung: " + lectureId);
             } else {
-                responseSpeach = "Der Studiengang konnte nicht gefunden werden. Bitte wiederholen Sie Ihre Anfrage.";
+                responseSpeach = "Der Studiengang oder die Vorlesung konnten nicht gefunden werden. Bitte wiederholen Sie Ihre Anfrage.";
                 //throw error maybe?
             }
 
@@ -54,8 +55,7 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId) => {
         let responseSpeach = "";
         let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/timetable/${courseId}/${groupsId}/${semesterId}`;
         //let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/timetable/all`;
-
-        console.log(requestURI)
+        //console.log(requestURI)
         const req = https.get(requestURI, function (res) {
             var body = [];
             res.on('data', function (chunk) {
@@ -72,7 +72,7 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId) => {
                     let start = ''
                     let found = 0
                     let block = 0
-                    console.log("gesucht: " + lectureId)
+                    //console.log("gesucht: " + lectureId)
 
                     const today = new Date()
                     let nextDate = new Date()
@@ -99,7 +99,6 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId) => {
                                     if (today < date && date < nextDate) {
                                         nextDate = date
                                         block = 1
-                                        //found = 1
                                         responseSpeach = "Die Blockveranstaltung " + lectureId + " findet das nächste Mal am " + nextDate.getDate() + "." + (nextDate.getMonth() + 1) + ". um " + start + " statt"
                                     }
                                 }
