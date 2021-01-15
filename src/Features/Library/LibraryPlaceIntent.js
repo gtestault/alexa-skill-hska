@@ -54,13 +54,32 @@ const getBuilding = (library) => {
                     let buildingOfBib = body['location'][0]['building'];
                     let nameOfBib = body['location'][0]['longName'];
                     let levelOfBib = body['location'][0]['level'];
-                    if (levelOfBib == null) {
+
+                    if (levelOfBib == null) {                                       //if the whole building is for the bib
                         responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib
-                    } else if (levelOfBib == 0) {
+                    } else if (levelOfBib == 0) {                                   //if bib is on the ground level
                         responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " im Erdgeschoss."
-                    } else if (levelOfBib.includes("/")) {
-                        let firstLevelOfBib = levelOfBib[0]
-                        let secondLevelOfBib = levelOfBib[2]
+                    } else if (levelOfBib.includes("/")) {                         //check if bib is in two levels
+                        let i = 0;
+                        let firstLevelOfBib = '';
+                        let secondLevelOfBib = '';
+
+                        //everything in front of "/" is added into an array
+                        while(levelOfBib[i] != "/") {
+                            firstLevelOfBib = firstLevelOfBib + levelOfBib[i];
+                            i++;
+                        }
+
+                        //everything after "/" is added into an array
+                        for(let j = 0; j < levelOfBib.length; j++) {
+                            if (levelOfBib[j] == "/") {
+                                while (j < levelOfBib.length - 1) {
+                                    j++;
+                                    secondLevelOfBib = secondLevelOfBib + levelOfBib[j];
+                                }
+                            }
+                        }
+
                         if (firstLevelOfBib == -1 && secondLevelOfBib == 0) {
                             responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " im Untergeschoss und Erdgeschoss."
                         } else if (firstLevelOfBib == 0 && secondLevelOfBib == 1) {
