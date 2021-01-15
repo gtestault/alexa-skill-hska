@@ -59,6 +59,8 @@ const getBuilding = (library) => {
                         responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib
                     } else if (levelOfBib == 0) {                                   //if bib is on the ground level
                         responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " im Erdgeschoss."
+                    } else if (levelOfBib == -1) {
+                        responseSpeech = "Die " + nameOfBib + " ist im Gebäude " + buildingOfBib + " im Untergeschoss."
                     } else if (levelOfBib.includes("/")) {                         //check if bib is in two levels
                         let i = 0;
                         let firstLevelOfBib = '';
