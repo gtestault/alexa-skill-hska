@@ -10,7 +10,6 @@ const ScheduleDateIntentHandler = {
     async handle(handlerInput) {
         let courseId
         let groupId = 0
-        let semesterId
         let lectureId
         let dateId
 
@@ -20,20 +19,19 @@ const ScheduleDateIntentHandler = {
         let responseSpeach = ""
 
         try {
-            if (utils.isSlotTypeValid(slotValues.course) && utils.isSlotTypeValid(slotValues.semester)
-                && utils.isSlotTypeValid(slotValues.lecture) && utils.isSlotTypeValid(slotValues.date)) {
+            if (utils.isSlotTypeValid(slotValues.course) && utils.isSlotTypeValid(slotValues.lecture)
+                && utils.isSlotTypeValid(slotValues.date)) {
 
                 courseId = slotValues.course.resolutions.resolutionsPerAuthority[0].values[0].value.id
-                semesterId = slotValues.semester.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 if (slotValues.groups.resolutions !== undefined) {
                     groupId = slotValues.groups.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 }
                 lectureId = slotValues.lecture.resolutions.resolutionsPerAuthority[0].values[0].value.name
                 dateId =  slotValues.date.resolutions.resolutionsPerAuthority[0].values[0].value.id
 
-                responseSpeach = await getScheduleInfo(courseId, semesterId, groupId, lectureId, dateId);
+                responseSpeach = await getScheduleInfo(courseId, groupId, lectureId, dateId);
 
-                console.log(courseId + " " + semesterId + ". Semester (Gruppe " + groupId + ") " + lectureId + ", " + dateId);
+                console.log(courseId + " (Gruppe " + groupId + ") " + lectureId + ", " + dateId);
             } else {
                 responseSpeach = "Der Studiengang oder die Vorlesung konnten nicht gefunden werden. Bitte wiederholen Sie Ihre Anfrage.";
                 //throw error maybe?
@@ -52,10 +50,10 @@ const ScheduleDateIntentHandler = {
 };
 
 
-const getScheduleInfo = (courseId, semesterId, groupsId, lectureId, date) => {
+const getScheduleInfo = (courseId, groupsId, lectureId, date) => {
     return new Promise((resolve, reject) => {
         let responseSpeach = "";
-        let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/timetable/${courseId}/${groupsId}/${semesterId}`;
+        let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/timetable/all`;
         //console.log(requestURI)
         const req = https.get(requestURI, function (res) {
             var body = [];
@@ -67,6 +65,8 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId, date) => {
                     body = JSON.parse(Buffer.concat(body).toString());
                     //console.log(`~~~~ Data received: ${JSON.stringify(body)}`);
 
+                    let m
+                    let o
                     let i = 0
                     let start = ''
                     let found = 0
@@ -85,23 +85,45 @@ const getScheduleInfo = (courseId, semesterId, groupsId, lectureId, date) => {
                     let nextDate = new Date()
                     nextDate.setDate(nextDate.getDate()+7) // + 1 Woche
 
-                    while (body.timetables[date].entries[i] !== undefined) {
-                        if (lectureId == body.timetables[date].entries[i].lectureName) {
+                    if (courseId == "INFB") {
+                        m = 0
+                        o = 7
+                    }
+                    else if (courseId == "INFM") {
+                        m = 7
+                        o =10
+                    }
+                    else if (courseId == "MINB") {
+                        m = 10
+                        o = 17
+                    }
+                    else if (courseId == "MKIB") {
+                        m = 17
+                        o = 24
+                    }
 
-                            const firstDate = new Date(body.timetables[date].entries[i].firstDate)
-                            firstDate.setHours(body.timetables[date].entries[i].startTime / 60, body.timetables[date].entries[i].startTime % 60 )
+                    while (m < o) {
+                        while (body[m].timetables[date].entries[i] !== undefined) {
+                            if (lectureId == body[m].timetables[date].entries[i].lectureName) {
 
-                            if (!(body.timetables[date].entries[i].interval == "BLOCK" && (firstDate < today || nextDate < firstDate))) {
-                                start = utils.convertValueToHour(body.timetables[date].entries[i].startTime)
-                                if (found > 0){
-                                    responseSpeach = responseSpeach + ", und "
+                                const firstDate = new Date(body[m].timetables[date].entries[i].firstDate)
+                                firstDate.setHours(body[m].timetables[date].entries[i].startTime / 60, body[m].timetables[date].entries[i].startTime % 60 )
+
+                                if (!(body[m].timetables[date].entries[i].interval == "BLOCK" && (firstDate < today || nextDate < firstDate))) {
+                                    start = utils.convertValueToHour(body[m].timetables[date].entries[i].startTime)
+                                    if (groupsId == 0 || (body[m].timetables[date].entries[i].group == "" || body[m].timetables[date].entries[i].group == groupsId)){
+                                        if (found > 0){
+                                            responseSpeach = responseSpeach + ", und "
+                                        }
+                                        found = found + 1
+                                        responseSpeach = responseSpeach + " um " + start
+                                    }
                                 }
-                                found = found + 1
-                                responseSpeach = responseSpeach + " um " + start
                             }
-
+                            i++
                         }
-                        i++
+                        m++
+                        i = 0
                     }
 
                     if(found == 0) {

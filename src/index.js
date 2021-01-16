@@ -9,7 +9,7 @@ const ScheduleTimeIntent = require("./Features/Schedule/ScheduleTimeIntent")
 const ScheduleDateIntent = require("./Features/Schedule/ScheduleDateIntent")
 const ScheduleRoomIntent = require("./Features/Schedule/ScheduleRoomIntent")
 const ScheduleLecturerIntent = require("./Features/Schedule/ScheduleLecturerIntent")
-
+const ScheduleLecturesIntent = require("./Features/Schedule/ScheduleLecturesIntent")
 
 // default intents
 const CancelIntent = require("./Default/intents/Cancel")
@@ -49,6 +49,7 @@ const customSkill = skillBuilder
         ScheduleRoomIntent,
         ScheduleNextIntent,
         ScheduleLecturerIntent,
+        ScheduleLecturesIntent,
         NewsIntent,
         LibraryIntent,
         PersonIntent
