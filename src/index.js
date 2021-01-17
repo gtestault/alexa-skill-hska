@@ -1,6 +1,8 @@
 const Alexa = require("ask-sdk");
 const https = require("https");
 const {CanteenIntentHandler, VegiCanteenIntentHandler} = require("./Features/Canteen/CanteenIntent")
+const OpeningHoursIntent = require("./Features/OpeningHours/OpeningHoursIntent")
+const BuildingOpenedIntent = require("./Features/OpeningHours/OpeningHoursIntent")
 //const NewsIntent = require("./Features/News/NewsIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
 const LibraryIntent = require("./Features/Library/LibraryIntent")
@@ -41,6 +43,8 @@ const customSkill = skillBuilder
         LaunchRequest,
         SessionEnded,
         //custom intents,
+        OpeningHoursIntent,
+        BuildingOpenedIntent,
         PersonIntent,
         //news intents
         NewsIntentHandler,
