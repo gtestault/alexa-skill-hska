@@ -13,6 +13,9 @@ const NavigateHomeIntent = require("./Default/intents/NavigateHome")
 const StopIntent = require("./Default/intents/Stop")
 const FallbackIntent = require("./Default/intents/Fallback")
 
+// news intents
+const {StartedInProgressNewsIntentHandler, ListNewsIntentHandler, NewsIntentHandler} = require("./Features/News/NewsIntent")
+
 // default handlers
 const LaunchRequest = require("./Default/handlers/LaunchRequest")
 const ErrorHandler = require("./Default/handlers/Error")
@@ -22,7 +25,7 @@ const SessionEnded = require("./Default/handlers/SessionEnded")
 const InitMemoryAttributesInterceptor = require("./Default/interceptors/InitMemoryAttributes")
 const RequestHistoryInterceptor = require("./Default/interceptors/RequestHistory")
 
-const SERVER_PORT = 8001
+const SERVER_PORT = 8000
 
 const APP_ID = undefined;  // TODO replace with your Skill ID (OPTIONAL).
 
@@ -38,6 +41,11 @@ const customSkill = skillBuilder
         LaunchRequest,
         SessionEnded,
         //custom intents,
+        PersonIntent,
+        //news intents
+        NewsIntentHandler,
+        ListNewsIntentHandler,
+        StartedInProgressNewsIntentHandler
         CanteenIntentHandler,
         VegiCanteenIntentHandler,
         //NewsIntent,
@@ -60,7 +68,7 @@ const customSkill = skillBuilder
     .create();
 
 const express = require('express');
-const { ExpressAdapter } = require('ask-sdk-express-adapter');
+const {ExpressAdapter} = require('ask-sdk-express-adapter');
 
 const app = express();
 const skill = skillBuilder.create();
