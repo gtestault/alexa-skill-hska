@@ -49,7 +49,7 @@ const customSkill = skillBuilder
         //news intents
         NewsIntentHandler,
         ListNewsIntentHandler,
-        StartedInProgressNewsIntentHandler
+        StartedInProgressNewsIntentHandler,
         CanteenIntentHandler,
         VegiCanteenIntentHandler,
         //NewsIntent,
