@@ -20,7 +20,7 @@ const PersonIntentHandler = {
                 personID = slotValues.person.resolutions.resolutionsPerAuthority[0].values[0].value.id
                 //requestDate = slotValues.DATE.value
 
-            } else if(utils.isSlotTypeValid(slotValues.person)) {
+            } else if(utils.isSlotTypeValid(slotValues.anrede)) {
                 title = slotValues.anrede.resolutions.resolutionsPerAuthority[0].values[0].value.name
             } else {
                 responseSpeach = "Der Dozent, die Dozentin konnte nicht gefunden werden. Bitte wiederholen Sie Ihre Anfrage.";
