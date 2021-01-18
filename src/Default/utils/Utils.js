@@ -27,8 +27,10 @@ module.exports = {
             return "Freitag";
         } else if (value == 5) {
             return "Samstag";
-        } else {
+        } else if (value == 6) {
             return "Sonntag";
+        } else {
+            return "-1";
         }
     },
 
@@ -41,5 +43,10 @@ module.exports = {
             }
             return true;
         }
+    },
+
+    validateResponseOnSpecialChars(responseSpeech) {
+        let response = responseSpeech.replace(/&/g, " und ");
+        return response;
     }
 }
