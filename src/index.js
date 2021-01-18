@@ -5,6 +5,12 @@ const OpeningHoursIntent = require("./Features/OpeningHours/OpeningHoursIntent")
 const BuildingOpenedIntent = require("./Features/OpeningHours/OpeningHoursIntent")
 //const NewsIntent = require("./Features/News/NewsIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
+const ScheduleNextIntent = require("./Features/Schedule/ScheduleNextIntent")
+const ScheduleTimeIntent = require("./Features/Schedule/ScheduleTimeIntent")
+const ScheduleDateIntent = require("./Features/Schedule/ScheduleDateIntent")
+const ScheduleRoomIntent = require("./Features/Schedule/ScheduleRoomIntent")
+const ScheduleLecturerIntent = require("./Features/Schedule/ScheduleLecturerIntent")
+const ScheduleLecturesIntent = require("./Features/Schedule/ScheduleLecturesIntent")
 const LibraryIntent = require("./Features/Library/LibraryIntent")
 const LibraryPlaceIntent = require("./Features/Library/LibraryPlaceIntent")
 
@@ -52,9 +58,15 @@ const customSkill = skillBuilder
         StartedInProgressNewsIntentHandler,
         CanteenIntentHandler,
         VegiCanteenIntentHandler,
-        //NewsIntent,
-        PersonIntent,
+        ScheduleTimeIntent,
+        ScheduleDateIntent,
+        ScheduleRoomIntent,
+        ScheduleNextIntent,
+        ScheduleLecturerIntent,
+        ScheduleLecturesIntent,
+        NewsIntent,
         LibraryIntent,
+        PersonIntent,
         LibraryPlaceIntent,
     )
     .addErrorHandlers(ErrorHandler)
