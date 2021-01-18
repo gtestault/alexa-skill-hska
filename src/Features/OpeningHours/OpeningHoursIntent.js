@@ -25,15 +25,26 @@ const OpeningHoursHandler = {
         const request = handlerInput.requestEnvelope.request
         const slotValues = request.intent.slots;
 
-        const office = slotValues.office.value
-        const building = office ? slotValues.office.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : slotValues.poi.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value.id;
-        
-        const type = office ? 'offices' : 'generals';
+        const office = slotValues.office.value;
+        const learningplace = slotValues.learningplace.value;
+        const generals = slotValues.generals.value;
+
+        let article = slotValues.article.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+        article = article ? article : "";
+
+        let poi;
+        poi = office && !poi ? slotValues.office.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : poi;
+        poi = generals && !poi ? slotValues.generals.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : poi;
+        poi = learningplace && !poi ? slotValues.learningplace.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : poi;
+        console.log(poi)
+
+
+        const type = office ? 'offices' : generals ? 'generals' : learningplace ? 'learningPlaces' : null;
 
         let response;
         try {
-            poiObj = await getPOI(building, type);
-            response = isOpeningHoursIntent ? await handleOpeningHours(poiObj) : await handleBuildingOpened(poiObj, slotValues.date.value);
+            poiObj = await getPOI(poi, type);
+            response = article + " " + (isOpeningHoursIntent ? await handleOpeningHours(poiObj, learningplace) : await handleBuildingOpened(poiObj, slotValues.date.value, learningplace));
         } catch (e) {
             console.log(`~~~~ No matching: ${e}`);
             response = e;
@@ -48,7 +59,14 @@ const OpeningHoursHandler = {
 
 const getPOI = (building, type) => {
     return new Promise((resolve, reject) => {
-        const uri = requestURI + 'poi/' + type + "/" + building.id;
+
+        let uri = "";
+        if (type == 'learningPlaces') {
+            uri = requestURI + type;
+        } else {
+            uri = requestURI + 'poi/' + type + "/" + building.id;
+        }
+
         const req = https.get(uri, (req, res) => {
             let body = [];
             req.on('data', (chunk) => {
@@ -57,21 +75,27 @@ const getPOI = (building, type) => {
 
             req.on('end', () => {
                 body = JSON.parse(Buffer.concat(body).toString());
-                console.log(body)
+
+
+                if (type == 'learningPlaces') {t
+                    body = body.find(x => x.id === parseInt(building.id));
+                }
+
                 if (body) {
                     resolve(body);
                 } else {
                     reject("Es konnten leider keine Informationen zu " + building.name + " gefunden werden.");
                 }
             });
+
         });
     });
 }
 
-const handleOpeningHours = (poi) => {
+const handleOpeningHours = (poi, learningPlace) => {
     return new Promise((resolve, reject) => {
         const convertedOpeningHours = convertOpeningHours(poi.openingHours, reject);
-        const prefix = "Das " + poi.name + " hat ";
+        const prefix = (learningPlace ? learningPlace : poi.name) + " hat ";
         let textArr = [];
         let text = prefix;
         for (var i = 0; i < convertedOpeningHours.length - 1; i++) {
@@ -111,7 +135,10 @@ const handleOpeningHours = (poi) => {
 }
 
 
-const handleBuildingOpened = (poi, date) => {
+// extra slot (article) und dann slot übernehmen
+// (Fehler abfangen)
+// Learningplaces
+const handleBuildingOpened = (poi, date, learningPlace) => {
     return new Promise((resolve, reject) => {
         const append = handleDate(date);
         let newDate = new Date();
@@ -128,8 +155,8 @@ const handleBuildingOpened = (poi, date) => {
         } else {
             textAppend = " nicht geöffnet";
         }
-        resolve("Das " + poi.name + " hat " + (date ? date : "heute") + textAppend);
-    })
+        resolve((learningPlace ? learningPlace : poi.name) + " hat " + (date ? date : "heute") + textAppend);
+    });
 }
 
 function convertOpeningHours(openingHours, reject) {
@@ -177,12 +204,20 @@ function convertOpeningHours(openingHours, reject) {
 }
 
 function splitString(openingHours) {
+    openingHours = openingHours.trim();
     const arr = openingHours.split(/(-)/g);
     const splitted = [];
     arr.forEach((string) => {
         const tmp = string.split(" ");
         tmp.forEach(word => splitted.push(word));
     });
+
+    for (let i = 0; i < splitted.length; i++) {
+        if (splitted[i] == '') {
+            splitted.splice(i, 1);
+            i--;
+        }
+    }
 
     return splitted;
 }
