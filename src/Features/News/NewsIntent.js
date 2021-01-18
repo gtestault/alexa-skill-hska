@@ -6,7 +6,6 @@ const utils = require("../../Default/utils/Utils")
 const got = require('got');
 const dateFormat = require("dateformat");
 
-
 exports.StartedInProgressNewsIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === "IntentRequest"
@@ -21,9 +20,7 @@ exports.StartedInProgressNewsIntentHandler = {
 };
 
 
-
-
-const ListNewsIntentHandler = {
+exports.ListNewsIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === "IntentRequest"
             && handlerInput.requestEnvelope.request.intent.name === "NewsIntent"
@@ -41,7 +38,7 @@ const ListNewsIntentHandler = {
         }
         const courseOfStudiesId = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority[0].values[0].value.name
         let requestedDate = slotValues.DATES.value || dateFormat(new Date(), "yyyy-mm-dd")
-        console.log(requestedDate)
+        //console.log(requestedDate)
         if (!requestedDate) {
             throw Error("news intent: no date value was resolved")
         }
@@ -56,8 +53,7 @@ const ListNewsIntentHandler = {
 };
 
 
-
-const NewsIntentHandler = {
+exports.NewsIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'NewsIntent'
@@ -89,100 +85,31 @@ const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
     const body = JSON.parse(res.body);
 
     let news = body;
-    let publicationDate;
-    //for (requestedDate === publicationDate in news) {}
+    
+        relevantNews = news.filter(newsElement => newsElement.publicationDate === requestedDate)
+        //relevantNews = news;
 
-    relevantNews = news.filter(newsElement => newsElement.publicationDate === requestedDate)
-
-    if (!relevantNews || relevantNews.length === 0) {
-        return "Es gibt keine neuen Meldungen"
-    }
-
-    responseSpeach += `Es gibt neue Meldungen mit den folgenden Titeln:`
-
-    let i = 1;
-    for (const newsElement of relevantNews) {
-        responseSpeach += `<break time="1s"/> Meldung ${i}: ${newsElement.title}.`
-        i++;
-    }
-    sessionAttributes.news = relevantNews
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-    return responseSpeach
-}
-
-
-
-/*
-const NewsIntentHandler = {
-    canHandle(handlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'NewsIntent';
-            && handlerInput.requestEnvelope.request.dialogState === "COMPLETED";
-    },
-    async handle(handlerInput) {
-        let courseOfStudiesId = ''
-        const request = handlerInput.requestEnvelope.request
-        //console.log(request)
-        const slotValues = request.intent.slots
-        //console.log(slotValues)
-
-
-        const newsResolutions = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority
-        if (!newsResolutions || newsResolutions.length === 0 || newsResolutions[0].values.length === 0) {
-            throw Error("news intent: no news id was resolved")
-        }
-        courseOfStudiesId = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority[0].values[0].value.id
-        let requestedDate = slotValues.DATES.value
-        if (!requestedDate) {
-            throw Error("news intent: no date value was resolved")
+        if (!relevantNews || relevantNews.length === 0) {
+            return "Es gibt keine neuen Meldungen"
         }
 
-        let responseSpeach = ""
-        responseSpeach = await getNews(courseOfStudiesId, requestedDate);
-        console.log(`TEXT TO SPEAK: ${responseSpeach}`);
-        return handlerInput.responseBuilder
-            .speak(responseSpeach)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
-            .getResponse();
-    }
-};
+        if (relevantNews.length === 1) {
+            return `Es gibt eine neue Meldung mit dem Titel: ${body[0]['title']} <break time="1s"/> ${body[0]['content']}.`
+        }
 
+        responseSpeach += `Es gibt neue Meldungen mit den folgenden Titeln:`
 
-const getNews = async (courseOfStudiesId, requestedDate) => {
-    let responseSpeach = "";
-    let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/newsbulletinboard/${courseOfStudiesId}`;
-    const res = await got(requestURI)
-
-    if (res.statusCode > 200) {
-        throw new Error(`news intent: http client: received status code ${res.statusCode}`)
-    }
-
-    const body = JSON.parse(res.body);
-
-    let news = body[0];
-    let publicationDate;
-    //for (requestedDate === publicationDate in news) {}
-
-
-    if (!body || body.length === 0) {
-        responseSpeach = "Es gibt keine neuen Meldungen"
-    }
-    else if (body.length === 1) {
-        responseSpeach = `Es gibt eine neue Meldung mit dem Titel: ${news.title}`
-    }
-
-
-    responseSpeach += `Es gibt neue Meldungen mit den folgenden Titeln:`
-
-    for (body.title in body) {
         let i = 1;
-        responseSpeach = "Titel" + i + body.title
-        i++;
-    }
-    // responseSpeach = `Bitte sage mir die Nummern der Meldungen die du hören möchtest.`
+        for (const newsElement of relevantNews) {
+            responseSpeach += `<break time="1s"/> Meldung ${i}: ${newsElement.title}.`
+            i++;
+        }
+        sessionAttributes.news = relevantNews
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return responseSpeach + " Welche Meldung möchtest du hören?"
+    //}
 
 
 }
-*/
 
-module.exports = NewsIntentHandler
+
