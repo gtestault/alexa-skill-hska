@@ -33,7 +33,7 @@ const SessionEnded = require("./Default/handlers/SessionEnded")
 const InitMemoryAttributesInterceptor = require("./Default/interceptors/InitMemoryAttributes")
 const RequestHistoryInterceptor = require("./Default/interceptors/RequestHistory")
 
-const SERVER_PORT = 8000
+const SERVER_PORT = process.env.NODE_PORT || 8000
 
 const APP_ID = undefined;  // TODO replace with your Skill ID (OPTIONAL).
 
