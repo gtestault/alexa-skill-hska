@@ -3,7 +3,6 @@ const https = require("https");
 const {CanteenIntentHandler, VegiCanteenIntentHandler} = require("./Features/Canteen/CanteenIntent")
 const OpeningHoursIntent = require("./Features/OpeningHours/OpeningHoursIntent")
 const BuildingOpenedIntent = require("./Features/OpeningHours/OpeningHoursIntent")
-//const NewsIntent = require("./Features/News/NewsIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
 const ScheduleNextIntent = require("./Features/Schedule/ScheduleNextIntent")
 const ScheduleTimeIntent = require("./Features/Schedule/ScheduleTimeIntent")
@@ -64,7 +63,6 @@ const customSkill = skillBuilder
         ScheduleNextIntent,
         ScheduleLecturerIntent,
         ScheduleLecturesIntent,
-        NewsIntent,
         LibraryIntent,
         PersonIntent,
         LibraryPlaceIntent,
