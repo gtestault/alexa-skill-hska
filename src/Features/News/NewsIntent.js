@@ -22,10 +22,10 @@ exports.StartedInProgressNewsIntentHandler = {
 
 exports.ListNewsIntentHandler = {
     canHandle(handlerInput) {
-            return handlerInput.requestEnvelope.request.type === "IntentRequest"
-                && handlerInput.requestEnvelope.request.intent.name === "NewsIntent"
-                && handlerInput.requestEnvelope.request.intent.slots.COURSE_OF_STUDIES.value
-                && !handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.value
+        return handlerInput.requestEnvelope.request.type === "IntentRequest"
+            && handlerInput.requestEnvelope.request.intent.name === "NewsIntent"
+            && handlerInput.requestEnvelope.request.intent.slots.COURSE_OF_STUDIES.value
+            && !handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.value
     },
 
     async handle(handlerInput) {
@@ -38,7 +38,7 @@ exports.ListNewsIntentHandler = {
         }
         const courseOfStudiesId = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority[0].values[0].value.name
         let requestedDate = slotValues.DATES.value || dateFormat(new Date(), "yyyy-mm-dd")
-        console.log(requestedDate)
+        //console.log(requestedDate)
         if (!requestedDate) {
             throw Error("news intent: no date value was resolved")
         }
@@ -51,6 +51,7 @@ exports.ListNewsIntentHandler = {
             .getResponse();
     }
 };
+
 
 exports.NewsIntentHandler = {
     canHandle(handlerInput) {
@@ -84,24 +85,31 @@ const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
     const body = JSON.parse(res.body);
 
     let news = body;
-    let publicationDate;
-    //for (requestedDate === publicationDate in news) {}
+    
+        relevantNews = news.filter(newsElement => newsElement.publicationDate === requestedDate)
+        //relevantNews = news;
 
-    relevantNews = news.filter(newsElement => newsElement.publicationDate === requestedDate)
+        if (!relevantNews || relevantNews.length === 0) {
+            return "Es gibt keine neuen Meldungen"
+        }
 
-    if (!relevantNews || relevantNews.length === 0) {
-        return "Es gibt keine neuen Meldungen"
-    }
+        if (relevantNews.length === 1) {
+            return `Es gibt eine neue Meldung mit dem Titel: ${body[0]['title']} <break time="1s"/> ${body[0]['content']}.`
+        }
 
-    responseSpeach += `Es gibt neue Meldungen mit den folgenden Titeln:`
+        responseSpeach += `Es gibt neue Meldungen mit den folgenden Titeln:`
 
-    let i = 1;
-    for (const newsElement of relevantNews) {
-        responseSpeach += `<break time="1s"/> Meldung ${i}: ${newsElement.title}.`
-        i++;
-    }
-    sessionAttributes.news = relevantNews
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-    return responseSpeach
+        let i = 1;
+        for (const newsElement of relevantNews) {
+            responseSpeach += `<break time="1s"/> Meldung ${i}: ${newsElement.title}.`
+            i++;
+        }
+        sessionAttributes.news = relevantNews
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return responseSpeach + " Welche Meldung möchtest du hören?"
+    //}
+
+
 }
+
 
