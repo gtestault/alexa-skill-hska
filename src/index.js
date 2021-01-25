@@ -10,7 +10,7 @@ const ScheduleDateIntent = require("./Features/Schedule/ScheduleDateIntent")
 const ScheduleRoomIntent = require("./Features/Schedule/ScheduleRoomIntent")
 const ScheduleLecturerIntent = require("./Features/Schedule/ScheduleLecturerIntent")
 const ScheduleLecturesIntent = require("./Features/Schedule/ScheduleLecturesIntent")
-const LibraryIntent = require("./Features/Library/LibraryIntent")
+const LibrarySeatsIntent = require("./Features/Library/LibrarySeatsIntent")
 const LibraryPlaceIntent = require("./Features/Library/LibraryPlaceIntent")
 
 // default intents
@@ -63,7 +63,7 @@ const customSkill = skillBuilder
         ScheduleNextIntent,
         ScheduleLecturerIntent,
         ScheduleLecturesIntent,
-        LibraryIntent,
+        LibrarySeatsIntent,
         PersonIntent,
         LibraryPlaceIntent,
     )
