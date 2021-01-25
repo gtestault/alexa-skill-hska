@@ -2,67 +2,114 @@
 
 const Alexa = require("ask-sdk");
 const https = require("https")
+const utils = require("../../Default/utils/Utils")
+const got = require('got');
+const dateFormat = require("dateformat");
 
-const NewsIntentHandler = {
+exports.StartedInProgressNewsIntentHandler = {
     canHandle(handlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'NewsIntent';
+        return handlerInput.requestEnvelope.request.type === "IntentRequest"
+            && handlerInput.requestEnvelope.request.intent.name === "NewsIntent"
+            && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
     },
-    async handle(handlerInput) {
-        let newsId = 0
-        const request = handlerInput.requestEnvelope.request
-        console.log(request)
-        //const slotValues = getSlotValues(request.intent.slots)
-        // console.log(slotValues)
-
-        let responseSpeach = ""
-        //responseSpeach = await getNewsInfo(messageId, requestedDate);
-        console.log(`TEXT TO SPEAK: ${responseSpeach}`);
+    handle(handlerInput) {
         return handlerInput.responseBuilder
-            .speak(responseSpeach)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+            .addDelegateDirective()
             .getResponse();
     }
 };
 
-/*
-const getNewsInfo = (courseOfStudies) => {
-    return new Promise((resolve, reject) => {
-        let responseSpeach = "";
-        let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/newsbulletinboard`;
-        console.log(requestURI)
-        const req = https.get(requestURI, function (res) {
-            var body = [];
-            res.on('data', function (chunk) {
-                body.push(chunk);
-            });
-            res.on('end', () => {
-                body = JSON.parse(Buffer.concat(body).toString());
-                console.log(`~~~~ Data received: ${JSON.stringify(body)}`);
-                if (body.length == 0) {
-                    responseSpeach = "Es gibt heute keine neuen Meldungen"
-                } else if (body.length == 1) {
-                    responseSpeach = `Auf dem schwarzen Brett für ${facultyName} gibt es heute die folgende neue Meldung: ${news[0]}.`
-                } else {
-                    responseSpeach = `Auf dem schwarzen Brett für ${facultyName} gibt es heute die folgenden neuen Meldungen:`
-                    for (const messageId.
-                    content
-                    of
-                    body
-                )
-                    {
-                        responseSpeach += " " + facultyName + ","
-                    }
-                }
-                resolve(responseSpeach)
-            });
-            res.on('error', (err) => {
-                throw err
-            });
-        });
-        req.end()
-    })
-}
-*/
 
-module.exports = NewsIntentHandler
+exports.ListNewsIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === "IntentRequest"
+            && handlerInput.requestEnvelope.request.intent.name === "NewsIntent"
+            && handlerInput.requestEnvelope.request.intent.slots.COURSE_OF_STUDIES.value
+            && !handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.value
+    },
+
+    async handle(handlerInput) {
+        const request = handlerInput.requestEnvelope.request
+        const slotValues = request.intent.slots
+
+        const newsResolutions = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority
+        if (!newsResolutions || newsResolutions.length === 0 || newsResolutions[0].values.length === 0) {
+            throw Error("news intent: no news id was resolved")
+        }
+        const courseOfStudiesId = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority[0].values[0].value.name
+        let requestedDate = slotValues.DATES.value || dateFormat(new Date(), "yyyy-mm-dd")
+        //console.log(requestedDate)
+        if (!requestedDate) {
+            throw Error("news intent: no date value was resolved")
+        }
+
+        let responseSpeach = await getNews(courseOfStudiesId, requestedDate, handlerInput);
+        return handlerInput.responseBuilder
+            .speak(responseSpeach)
+            .reprompt(responseSpeach)
+            .addElicitSlotDirective('NEWS_SELECTION')
+            .getResponse();
+    }
+};
+
+
+exports.NewsIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'NewsIntent'
+            && handlerInput.requestEnvelope.request.dialogState === "COMPLETED";
+    },
+    async handle(handlerInput) {
+        let selectedNewsIndex = handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.value
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const content = sessionAttributes.news[parseInt(selectedNewsIndex, 10) - 1].content
+        let speechText = content
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .getResponse();
+    }
+};
+
+
+const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    let responseSpeach = "";
+    let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/newsbulletinboard/${courseOfStudiesId}`;
+    console.log(requestURI)
+    const res = await got(requestURI)
+
+    if (res.statusCode > 200) {
+        throw new Error(`news intent: http client: received status code ${res.statusCode}`)
+    }
+
+    const body = JSON.parse(res.body);
+
+    let news = body;
+    
+        relevantNews = news.filter(newsElement => newsElement.publicationDate === requestedDate)
+        //relevantNews = news;
+
+        if (!relevantNews || relevantNews.length === 0) {
+            return "Es gibt keine neuen Meldungen"
+        }
+
+        if (relevantNews.length === 1) {
+            return `Es gibt eine neue Meldung mit dem Titel: ${body[0]['title']} <break time="1s"/> ${body[0]['content']}.`
+        }
+
+        responseSpeach += `Es gibt neue Meldungen mit den folgenden Titeln:`
+
+        let i = 1;
+        for (const newsElement of relevantNews) {
+            responseSpeach += `<break time="1s"/> Meldung ${i}: ${newsElement.title}.`
+            i++;
+        }
+        sessionAttributes.news = relevantNews
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return responseSpeach + " Welche Meldung möchtest du hören?"
+    //}
+
+
+}
+
+

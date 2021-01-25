@@ -1,0 +1,13 @@
+[Unit]
+Description=alexa hs skill
+After=network.target
+
+[Service]
+Environment=NODE_PORT=80
+Type=simple
+User=azureuser
+ExecStart=/usr/bin/node /home/ubuntu/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
