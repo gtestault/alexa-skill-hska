@@ -2,11 +2,11 @@ const Alexa = require("ask-sdk");
 const https = require("https");
 const utils = require("../../Default/utils/Utils.js")
 
-const LibrarySeatsIntentHandler = {
-    //identify the request for the right intent and return true, if it is LibrarySeatsIntent
+const LibraryIntentHandler = {
+    //identify the request for the right intent and return true, if it is LibraryIntent
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'LibrarySeatsIntent';
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'LibraryIntent';
     },
     async handle(handlerInput) {
         let bibID = ''
@@ -77,4 +77,4 @@ const getFreeSeats = (library) => {
     });
 }
 
-module.exports = LibrarySeatsIntentHandler
+module.exports = LibraryIntentHandler
