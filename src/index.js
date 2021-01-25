@@ -1,6 +1,5 @@
 const Alexa = require("ask-sdk");
 const https = require("https");
-const CanteenIntent = require("./Features/Canteen/CanteenIntent")
 
 // default intents
 const CancelIntent = require("./Default/intents/Cancel")
@@ -33,8 +32,6 @@ const customSkill = skillBuilder
         NavigateHomeIntent,
         LaunchRequest,
         SessionEnded,
-        //custom intents,
-        CanteenIntent,
     )
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
