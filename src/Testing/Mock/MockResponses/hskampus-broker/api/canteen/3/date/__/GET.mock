@@ -1,0 +1,390 @@
+HTTP/1.1 200 OK
+Content-Type: text/json; charset=utf-8
+
+[
+  {
+    "name": "Adenauerring",
+    "id": 5692,
+    "planDate": 1578870000000,
+    "lines": [
+      {
+        "id": 25322,
+        "name": "Linie 1",
+        "meals": [
+          {
+            "id": 78390,
+            "dish": "mit Ketchup und Pommes",
+            "additives": "[\"2\",\"3\",\"ML\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 2.6,
+            "price2": 4,
+            "price3": 3.4,
+            "price4": 2.95,
+            "meal": "Käseknacker"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25323,
+        "name": "Cafeteria ab 14:30",
+        "meals": [
+          {
+            "id": 78393,
+            "dish": "",
+            "additives": "[\"Ei\",\"Ge\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 2.2,
+            "price2": 2.2,
+            "price3": 2.2,
+            "price4": 2.2,
+            "meal": "Geflügelfrikadelle mit Brötchen"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25324,
+        "name": "Linie 2",
+        "meals": [
+          {
+            "id": 78395,
+            "dish": "mit Tzatziki",
+            "additives": "[\"1\",\"Ei\",\"LAB\",\"ML\",\"Sn\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": true,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 2.3,
+            "price2": 5.05,
+            "price3": 3.4,
+            "price4": 2.65,
+            "meal": "Bifteki"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25325,
+        "name": "Linie 3",
+        "meals": [
+          {
+            "id": 78402,
+            "dish": "",
+            "additives": "[\"2\",\"Ei\",\"LAB\",\"ML\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": true,
+            "priceFlag": 0,
+            "price1": 2.35,
+            "price2": 5.15,
+            "price3": 3.45,
+            "price4": 2.7,
+            "meal": "Pasta con rucola e parmigiano"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25326,
+        "name": "salat_dessert",
+        "meals": [
+          {
+            "id": 78406,
+            "dish": "",
+            "additives": "[\"Ei\",\"Se\",\"Sn\",\"So\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": true,
+            "priceFlag": 0,
+            "price1": 1.7,
+            "price2": 2.15,
+            "price3": 1.7,
+            "price4": 1.7,
+            "meal": "Insalata piccola - kleiner Blattsalat mit Tomate und Gurke"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25327,
+        "name": "Schnitzelbar",
+        "meals": [
+          {
+            "id": 78409,
+            "dish": "Salatbuffet und Pommes - alles zur Wahl zu einem Preis",
+            "additives": "[\"5\",\"Ei\",\"Hf\",\"LAB\",\"ML\",\"Se\",\"Sn\",\"So\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": true,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 0.83,
+            "price2": 1.66,
+            "price3": 1.14,
+            "price4": 0.96,
+            "meal": "Schweine- und Hähnchenschnitzel, vegetarische Leckereien,"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25328,
+        "name": "L6 Update",
+        "meals": [
+          {
+            "id": 78413,
+            "dish": "",
+            "additives": "[\"1\",\"2\",\"3\",\"Ei\",\"ML\",\"Sa\",\"Sf\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": true,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 0.83,
+            "price2": 1.66,
+            "price3": 1.14,
+            "price4": 0.96,
+            "meal": "Hamburger-, Salat-, Buffet"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25329,
+        "name": "Linie 4/5",
+        "meals": [
+          {
+            "id": 78415,
+            "dish": "",
+            "additives": "[\"3\",\"Ge\",\"Se\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": true,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 2.5,
+            "price2": 5.5,
+            "price3": 3.7,
+            "price4": 2.9,
+            "meal": "Kalbsragout Gärtnerin Art"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25330,
+        "name": "Cafeteria Heiße Theke",
+        "meals": [
+          {
+            "id": 78423,
+            "dish": "",
+            "additives": "[\"1\",\"3\",\"Ge\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 2.4,
+            "price2": 2.4,
+            "price3": 2.4,
+            "price4": 2.4,
+            "meal": "Hähnchenschnitzel mit Brötchen"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25331,
+        "name": "pizza",
+        "meals": [
+          {
+            "id": 78429,
+            "dish": "",
+            "additives": "[\"2\",\"3\",\"ML\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": true,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 4.65,
+            "price2": 9.3,
+            "price3": 6.4,
+            "price4": 5.35,
+            "meal": "Pizza Prosciutto cotto - italienischer gekochter Schinken, Cocktailtomaten und Mozzarella"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25332,
+        "name": "pasta",
+        "meals": [
+          {
+            "id": 78432,
+            "dish": "",
+            "additives": "[\"2\",\"Ei\",\"LAB\",\"ML\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 4.55,
+            "price2": 9.1,
+            "price3": 6.25,
+            "price4": 5.25,
+            "meal": "Amatriciana - Tomatensoße mit Speck, Peperoncini und Parmesan"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25333,
+        "name": "Abend",
+        "meals": [
+          {
+            "id": 78436,
+            "dish": "Info zum Speisenangebot direkt an der Ausgabe",
+            "additives": "[\"\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": false,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 2.6,
+            "price2": 4,
+            "price3": 3.4,
+            "price4": 2.95,
+            "meal": "Spätausgabe 14:00 bis 14:30 an der Linie 1"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      },
+      {
+        "id": 25334,
+        "name": "Curry Queen",
+        "meals": [
+          {
+            "id": 78438,
+            "dish": "",
+            "additives": "[\"Se\",\"Sn\",\"We\"]",
+            "bio": false,
+            "fish": false,
+            "pork": false,
+            "porkAw": null,
+            "cow": true,
+            "cowAw": false,
+            "vegan": false,
+            "veg": false,
+            "priceFlag": 0,
+            "price1": 2,
+            "price2": 2.2,
+            "price3": 2.2,
+            "price4": 2.2,
+            "meal": "Reine Kalbsbratwurst mit Currysauce und Baguette"
+          }
+        ],
+        "closingStart": null,
+        "closingEnd": null,
+        "closed": false,
+        "noData": true
+      }
+    ]
+  }
+]
+

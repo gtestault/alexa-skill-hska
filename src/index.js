@@ -1,10 +1,17 @@
 const Alexa = require("ask-sdk");
 const https = require("https");
-const CanteenIntent = require("./Features/Canteen/CanteenIntent")
+const {CanteenIntentHandler, VegiCanteenIntentHandler} = require("./Features/Canteen/CanteenIntent")
 const OpeningHoursIntent = require("./Features/OpeningHours/OpeningHoursIntent")
 const BuildingOpenedIntent = require("./Features/OpeningHours/OpeningHoursIntent")
-//const NewsIntent = require("./Features/News/NewsIntent")
 const PersonIntent = require("./Features/Person/PersonIntent")
+const ScheduleNextIntent = require("./Features/Schedule/ScheduleNextIntent")
+const ScheduleTimeIntent = require("./Features/Schedule/ScheduleTimeIntent")
+const ScheduleDateIntent = require("./Features/Schedule/ScheduleDateIntent")
+const ScheduleRoomIntent = require("./Features/Schedule/ScheduleRoomIntent")
+const ScheduleLecturerIntent = require("./Features/Schedule/ScheduleLecturerIntent")
+const ScheduleLecturesIntent = require("./Features/Schedule/ScheduleLecturesIntent")
+const LibraryIntent = require("./Features/Library/LibraryIntent")
+const LibraryPlaceIntent = require("./Features/Library/LibraryPlaceIntent")
 
 // default intents
 const CancelIntent = require("./Default/intents/Cancel")
@@ -12,6 +19,9 @@ const HelpIntent = require("./Default/intents/Help")
 const NavigateHomeIntent = require("./Default/intents/NavigateHome")
 const StopIntent = require("./Default/intents/Stop")
 const FallbackIntent = require("./Default/intents/Fallback")
+
+// news intents
+const {StartedInProgressNewsIntentHandler, ListNewsIntentHandler, NewsIntentHandler} = require("./Features/News/NewsIntent")
 
 // default handlers
 const LaunchRequest = require("./Default/handlers/LaunchRequest")
@@ -22,7 +32,7 @@ const SessionEnded = require("./Default/handlers/SessionEnded")
 const InitMemoryAttributesInterceptor = require("./Default/interceptors/InitMemoryAttributes")
 const RequestHistoryInterceptor = require("./Default/interceptors/RequestHistory")
 
-const SERVER_PORT = 8000
+const SERVER_PORT = process.env.NODE_PORT || 8000
 
 const APP_ID = undefined;  // TODO replace with your Skill ID (OPTIONAL).
 
@@ -38,11 +48,24 @@ const customSkill = skillBuilder
         LaunchRequest,
         SessionEnded,
         //custom intents,
-        CanteenIntent,
         OpeningHoursIntent,
         BuildingOpenedIntent,
-        //NewsIntent,
-        PersonIntent
+        PersonIntent,
+        //news intents
+        NewsIntentHandler,
+        ListNewsIntentHandler,
+        StartedInProgressNewsIntentHandler,
+        CanteenIntentHandler,
+        VegiCanteenIntentHandler,
+        ScheduleTimeIntent,
+        ScheduleDateIntent,
+        ScheduleRoomIntent,
+        ScheduleNextIntent,
+        ScheduleLecturerIntent,
+        ScheduleLecturesIntent,
+        LibraryIntent,
+        PersonIntent,
+        LibraryPlaceIntent,
     )
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
@@ -59,8 +82,7 @@ const customSkill = skillBuilder
     .create();
 
 const express = require('express');
-const { ExpressAdapter } = require('ask-sdk-express-adapter');
-const OpeningHoursHandler = require("./Features/OpeningHours/OpeningHoursIntent");
+const {ExpressAdapter} = require('ask-sdk-express-adapter');
 
 const app = express();
 const skill = skillBuilder.create();
