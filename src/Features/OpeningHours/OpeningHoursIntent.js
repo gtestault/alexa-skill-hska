@@ -27,19 +27,18 @@ const OpeningHoursHandler = {
 
         const office = slotValues.office.value;
         const learningplace = slotValues.learningplace.value;
-        const generals = slotValues.generals.value;
+        const general = slotValues.general.value;
 
         let article = slotValues.article.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value.name;
         article = article ? article : "";
 
+
         let poi;
         poi = office && !poi ? slotValues.office.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : poi;
-        poi = generals && !poi ? slotValues.generals.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : poi;
+        poi = general && !poi ? slotValues.general.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : poi;
         poi = learningplace && !poi ? slotValues.learningplace.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : poi;
-        console.log(poi)
 
-
-        const type = office ? 'offices' : generals ? 'generals' : learningplace ? 'learningPlaces' : null;
+        const type = office ? 'offices' : general ? 'generals' : learningplace ? 'learningPlaces' : null;
 
         let response;
         try {
@@ -77,8 +76,8 @@ const getPOI = (building, type) => {
                 body = JSON.parse(Buffer.concat(body).toString());
 
 
-                if (type == 'learningPlaces') {t
-                    body = body.find(x => x.id === parseInt(building.id));
+                if (type == 'learningPlaces') {
+                    body = body.find(x => x.shortName === building.id);
                 }
 
                 if (body) {
@@ -106,6 +105,13 @@ const handleOpeningHours = (poi, learningPlace) => {
                 let next = convertedOpeningHours[j + 1];
                 if (next && next.Opens === start.Opens && next.Closes === start.Closes) {
                     isSequence = true;
+
+                    if (next.Day == convertedOpeningHours[convertedOpeningHours.length - 1].Day) {
+                        textArr.push(start.Day + " bis " + convertedOpeningHours[j+1].Day + " von "
+                            + start.Opens + " bis " + start.Closes + " Uhr");
+                        i = j;
+                    }
+
                 } else {
                     if (isSequence) {
                         // Last day in sequence
