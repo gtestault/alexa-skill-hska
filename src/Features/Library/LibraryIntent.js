@@ -3,7 +3,7 @@ const https = require("https");
 const utils = require("../../Default/utils/Utils.js")
 
 const LibraryIntentHandler = {
-    //identify the request for the right intent and return true, if it is libraryintent
+    //identify the request for the right intent and return true, if it is LibraryIntent
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'LibraryIntent';
@@ -55,7 +55,10 @@ const getFreeSeats = (library) => {
                     let nameOfBib = body['location'][0]['longName'];
                     let freeSeats = body['seatestimate'][1]['freeSeats'];
                     console.log("Free seats: " + freeSeats);
-                    if (freeSeats == 1) {
+
+                    if (freeSeats == "" || freeSeats == undefined || freeSeats == null) {
+                        responseSpeech = "Die freien Plätze können nicht ausgegeben werden."
+                    } else if (freeSeats == 1) {
                         responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon ist " + freeSeats + " frei."
                     } else if (freeSeats == 0) {
                         responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind keine Plätze frei."
