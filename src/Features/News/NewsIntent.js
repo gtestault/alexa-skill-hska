@@ -43,10 +43,10 @@ exports.ListNewsIntentHandler = {
             throw Error("news intent: no date value was resolved")
         }
 
-        let responseSpeach = await getNews(courseOfStudiesId, requestedDate, handlerInput);
+        let responseSpeech = await getNews(courseOfStudiesId, requestedDate, handlerInput);
         return handlerInput.responseBuilder
-            .speak(responseSpeach)
-            .reprompt(responseSpeach)
+            .speak(responseSpeech)
+            .reprompt(responseSpeech)
             .addElicitSlotDirective('NEWS_SELECTION')
             .getResponse();
     }
@@ -73,7 +73,7 @@ exports.NewsIntentHandler = {
 
 const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    let responseSpeach = "";
+    let responseSpeech = "";
     let requestURI = `https://www.iwi.hs-karlsruhe.de/iwii/REST/newsbulletinboard/${courseOfStudiesId}`;
     console.log(requestURI)
     const res = await got(requestURI)
@@ -87,7 +87,6 @@ const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
     let news = body;
     
         relevantNews = news.filter(newsElement => newsElement.publicationDate === requestedDate)
-        //relevantNews = news;
 
         if (!relevantNews || relevantNews.length === 0) {
             return "Es gibt keine neuen Meldungen"
@@ -97,17 +96,17 @@ const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
             return `Es gibt eine neue Meldung mit dem Titel: ${body[0]['title']} <break time="1s"/> ${body[0]['content']}.`
         }
 
-        responseSpeach += `Es gibt neue Meldungen mit den folgenden Titeln:`
+        responseSpeech += `Es gibt neue Meldungen mit den folgenden Titeln:`
 
         let i = 1;
         for (const newsElement of relevantNews) {
-            responseSpeach += `<break time="1s"/> Meldung ${i}: ${newsElement.title}.`
+            responseSpeech += `<break time="1s"/> Meldung ${i}: ${newsElement.title}.`
             i++;
         }
         sessionAttributes.news = relevantNews
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-        return responseSpeach + " Welche Meldung möchtest du hören?"
-    //}
+        return responseSpeech + " Welche Meldung möchtest du hören?"
+
 
 
 }
