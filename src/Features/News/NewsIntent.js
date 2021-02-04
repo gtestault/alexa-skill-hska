@@ -112,4 +112,3 @@ const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
 
 }
 
-
