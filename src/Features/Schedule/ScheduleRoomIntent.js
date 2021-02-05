@@ -141,7 +141,7 @@ const getScheduleInfo = (courseId, groupsId, lectureId, date) => {
                         if (noRoom == false) {
                             responseSpeach = "Die Vorlesung " + lectureId + " findet am " + utils.convertValueToDay(date) + responseSpeach + " statt"
                         } else {
-                            responseSpeach = "Für die Vorlesung " + lectureId + " gibt es dazu keine Infos"
+                            responseSpeach = "Für die Vorlesung " + lectureId + " liegen keine Informationen vor"
                         }
                     }
 
