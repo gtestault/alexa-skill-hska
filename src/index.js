@@ -71,7 +71,6 @@ const customSkill = skillBuilder
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
     .addRequestInterceptors(RequestHistoryInterceptor)
-    .addRequestInterceptors(ResponseRecordSpeechOutputInterceptor)
 
     // .addResponseInterceptors(ResponseRecordSpeechOutputInterceptor)
 
