@@ -1,3 +1,4 @@
+const {getSampleUtterance} = require("../utils/HelperFunctions");
 module.exports = AMAZON_HelpIntent_Handler = {
     canHandle(handlerInput) {
         const request = handlerInput.requestEnvelope.request;

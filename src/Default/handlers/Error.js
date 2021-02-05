@@ -5,11 +5,10 @@ module.exports = ErrorHandler = {
     handle(handlerInput, error) {
         const request = handlerInput.requestEnvelope.request;
         console.log(`Error handled: ${error.message}`);
-        // console.log(`Original Request was: ${JSON.stringify(request, null, 2)}`);
 
         return handlerInput.responseBuilder
-            .speak('Sorry, an error occurred.  Please say again.')
-            .reprompt('Sorry, an error occurred.  Please say again.')
+            .speak('Die Hochschule ist gerade beschäftigt, bitte versuchen Sie Ihre Anfrage nochmal später.')
+            .reprompt('Die Hochschule ist gerade beschäftigt, bitte versuchen Sie Ihre Anfrage nochmal später.')
             .getResponse();
     }
 };

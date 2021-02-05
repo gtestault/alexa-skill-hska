@@ -16,7 +16,7 @@ module.exports = AMAZON_FallbackIntent_Handler = {
         let previousSpeech = getPreviousSpeechOutput(sessionAttributes);
 
         return responseBuilder
-            .speak('Sorry I didnt catch what you said, ' + stripSpeak(previousSpeech.outputSpeech))
+            .speak('Ich habe deine Anfrage nicht verstanden' + stripSpeak(previousSpeech.outputSpeech))
             .reprompt(stripSpeak(previousSpeech.reprompt))
             .getResponse();
     },

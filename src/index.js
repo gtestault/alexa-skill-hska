@@ -31,6 +31,7 @@ const SessionEnded = require("./Default/handlers/SessionEnded")
 //default interceptors
 const InitMemoryAttributesInterceptor = require("./Default/interceptors/InitMemoryAttributes")
 const RequestHistoryInterceptor = require("./Default/interceptors/RequestHistory")
+const ResponseRecordSpeechOutputInterceptor = require("./Default/interceptors/ResponseRecordSpeechOutput")
 
 const SERVER_PORT = process.env.NODE_PORT || 8000
 
@@ -70,6 +71,7 @@ const customSkill = skillBuilder
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
     .addRequestInterceptors(RequestHistoryInterceptor)
+    .addRequestInterceptors(ResponseRecordSpeechOutputInterceptor)
 
     // .addResponseInterceptors(ResponseRecordSpeechOutputInterceptor)
 

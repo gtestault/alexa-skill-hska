@@ -12,6 +12,9 @@ module.exports = {
     },
 
     stripSpeak(str) {
+        if (!str) {
+            return ""
+        }
         return (str.replace('<speak>', '').replace('</speak>', ''));
     },
 
