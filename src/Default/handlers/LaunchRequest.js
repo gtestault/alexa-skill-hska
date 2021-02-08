@@ -16,7 +16,7 @@ module.exports = LaunchRequest_Handler = {
 
         return responseBuilder
             .speak(say)
-            .reprompt('try again, ' + say)
+            .reprompt('Ich konnte dich leider nicht verstehen, bitte versuche deine Anfrage nochmal')
             .getResponse();
     },
 };

@@ -1,0 +1,23 @@
+module.exports = [
+    "Gibt es freie Plätze in (Bibliothek)?",
+    "In welchem Gebäude befindet sich (Bibliothek)?",
+    "Was gibt es zu essen in (Mensa)?",
+    "Welche Linie hat vegetarisches essen in (Mensa)?",
+    "Neues auf dem schwarzen Brett für (Studiengang)?",
+    "Was sind die Neuigkeiten für (Studiengang) (Datum)?",
+    "Die (Nummer) Meldung.",
+    "Wann findet die (Vorlesung) statt?",
+    "Um wieviel Uhr ist (Vorlesung) am (Wochentag)?",
+    "Wo ist (Vorlesung) am (Wochentag)?",
+    "Bei wem ist (Vorlesung) am (Wochentag)?",
+    "(Wann/Was/Wo/Bei wem) ist die nächste Vorlesung?",
+    "Welche Vorlesungen am (Wochentag)?",
+    "Ist an (Datum) Vorlesung?",
+    "Mehr Informationen über (Vorlesung)",
+    "Wie sind die Öffnungszeiten von (Gebäude)?",
+    "Hat das (Gebäude) geöffnet?",
+    "Hat das (Gebäude) (Time) geöffnet?",
+    "Wann findet die Sprechstunde von (Dozent/in) statt?",
+    "Wo findet die Sprechstunde von (Dozent/in) statt?",
+    "Wann ist die Sprechstunde von (Dozent/in)?"
+]

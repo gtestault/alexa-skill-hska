@@ -5,10 +5,11 @@ module.exports = ErrorHandler = {
     handle(handlerInput, error) {
         const request = handlerInput.requestEnvelope.request;
         console.log(`Error handled: ${error.message}`);
+        console.error(error)
 
         return handlerInput.responseBuilder
-            .speak('Die Hochschule ist gerade beschäftigt, bitte versuchen Sie Ihre Anfrage nochmal später.')
-            .reprompt('Die Hochschule ist gerade beschäftigt, bitte versuchen Sie Ihre Anfrage nochmal später.')
+            .speak('Es ist ein Fehler aufgetretten, bitte versuchen Sie Ihre Anfrage nochmal später.')
+            .withShouldEndSession(true)
             .getResponse();
     }
 };

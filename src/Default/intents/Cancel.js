@@ -9,7 +9,7 @@ module.exports = AMAZON_CancelIntent_Handler = {
         let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
 
-        let say = 'Okay, talk to you later! ';
+        let say = 'Alles Klar! Bis später!';
 
         return responseBuilder
             .speak(say)

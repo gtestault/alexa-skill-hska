@@ -9,7 +9,7 @@ module.exports = AMAZON_StopIntent_Handler = {
         let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
 
-        let say = 'Okay, talk to you later! ';
+        let say = 'Alles klar, bis später!';
 
         return responseBuilder
             .speak(say)

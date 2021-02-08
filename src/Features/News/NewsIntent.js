@@ -5,6 +5,7 @@ const https = require("https")
 const utils = require("../../Default/utils/Utils")
 const got = require('got');
 const dateFormat = require("dateformat");
+const {escapeForSSML} = require("../../Default/utils/HelperFunctions");
 
 exports.StartedInProgressNewsIntentHandler = {
     canHandle(handlerInput) {
@@ -63,7 +64,7 @@ exports.NewsIntentHandler = {
         let selectedNewsIndex = handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.value
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const content = sessionAttributes.news[parseInt(selectedNewsIndex, 10) - 1].content
-        let speechText = content
+        let speechText = escapeForSSML(content)
         return handlerInput.responseBuilder
             .speak(speechText)
             .getResponse();
@@ -82,11 +83,9 @@ const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
         throw new Error(`news intent: http client: received status code ${res.statusCode}`)
     }
 
-    const body = JSON.parse(res.body);
+    const news = JSON.parse(res.body);
 
-    let news = body;
-    
-        relevantNews = news.filter(newsElement => newsElement.publicationDate === requestedDate)
+        let relevantNews = news.filter(newsElement => newsElement.publicationDate === requestedDate)
         //relevantNews = news;
 
         if (!relevantNews || relevantNews.length === 0) {
@@ -104,6 +103,7 @@ const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
             responseSpeach += `<break time="1s"/> Meldung ${i}: ${newsElement.title}.`
             i++;
         }
+        responseSpeach = escapeForSSML(responseSpeach)
         sessionAttributes.news = relevantNews
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return responseSpeach + " Welche Meldung möchtest du hören?"

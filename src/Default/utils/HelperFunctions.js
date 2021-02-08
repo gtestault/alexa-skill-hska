@@ -1,4 +1,6 @@
-module.exports = {
+const model = require("../../model");
+
+const utils = {
 
     capitalize(myString) {
 
@@ -139,9 +141,9 @@ module.exports = {
         return customIntents;
     },
 
-    getSampleUtterance(intent) {
+    getSampleUtterance(sampleUterrances) {
 
-        return randomElement(intent.samples);
+        return this.randomElement(sampleUterrances);
 
     },
 
@@ -199,3 +201,8 @@ module.exports = {
         return span;
     }
 }
+
+utils.getSampleUtterance = utils.getSampleUtterance.bind(utils)
+module.exports = utils
+
+
