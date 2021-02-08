@@ -7,6 +7,8 @@ const got = require('got');
 const dateFormat = require("dateformat");
 const {escapeForSSML} = require("../../Default/utils/HelperFunctions");
 
+const noNews = "Es gibt keine neuen Meldungen"
+
 exports.StartedInProgressNewsIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === "IntentRequest"
@@ -45,6 +47,9 @@ exports.ListNewsIntentHandler = {
         }
 
         let responseSpeach = await getNews(courseOfStudiesId, requestedDate, handlerInput);
+        if (responseSpeach === noNews) {
+           return handlerInput.responseBuilder.speak(responseSpeach).getResponse()
+        }
         return handlerInput.responseBuilder
             .speak(responseSpeach)
             .reprompt(responseSpeach)
@@ -89,7 +94,7 @@ const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
         //relevantNews = news;
 
         if (!relevantNews || relevantNews.length === 0) {
-            return "Es gibt keine neuen Meldungen"
+            return noNews
         }
 
         if (relevantNews.length === 1) {
