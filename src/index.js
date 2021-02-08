@@ -12,6 +12,7 @@ const FallbackIntent = require("./Default/intents/Fallback")
 const LaunchRequest = require("./Default/handlers/LaunchRequest")
 const ErrorHandler = require("./Default/handlers/Error")
 const SessionEnded = require("./Default/handlers/SessionEnded")
+const HelloWorld = require("./Default/intents/HelloWorld")
 
 //default interceptors
 const InitMemoryAttributesInterceptor = require("./Default/interceptors/InitMemoryAttributes")
@@ -32,6 +33,7 @@ const customSkill = skillBuilder
         NavigateHomeIntent,
         LaunchRequest,
         SessionEnded,
+        HelloWorld,
     )
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(InitMemoryAttributesInterceptor)
