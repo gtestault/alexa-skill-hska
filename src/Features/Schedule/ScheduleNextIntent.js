@@ -117,15 +117,13 @@ const getScheduleInfo = (courseId, semesterId, groupsId, questionId) => {
                             responseSpeach = "Die nächste Vorlesung " + lectureName + " ist" + responseSpeach + " um " + start
                         }
                         else if (questionId == 3) { // wo
-                            let room = " statt"
                             if (body.timetables[day].entries[i].locations[0] !== undefined) {
-                                room = body.timetables[day].entries[i].locations[0].room + room
+                                let room = body.timetables[day].entries[i].locations[0].room
+                                let building = body.timetables[day].entries[i].locations[0].building
+                                responseSpeach = "Die nächste Vorlesung " + lectureName + " findet in " + building + room + " statt"
+                            } else {
+                                responseSpeach = "Für die Vorlesung " + lectureName + " liegen keine Informationen vor"
                             }
-                            let building = "online "
-                            if (body.timetables[day].entries[i].locations[0] !== undefined) {
-                                building = "in " + body.timetables[day].entries[i].locations[0].building
-                            }
-                            responseSpeach = "Die nächste Vorlesung " + lectureName + " findet " + building + room
                         }
                         else { // bei wem
                             let lecturer = body.timetables[day].entries[i].lecturerNames[0]
