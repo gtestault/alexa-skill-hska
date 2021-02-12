@@ -12,8 +12,6 @@ module.exports = [
     "Bei wem ist (Vorlesung) am (Wochentag)?",
     "(Wann/Was/Wo/Bei wem) ist die nächste Vorlesung?",
     "Welche Vorlesungen am (Wochentag)?",
-    "Ist an (Datum) Vorlesung?",
-    "Mehr Informationen über (Vorlesung)",
     "Wie sind die Öffnungszeiten von (Gebäude)?",
     "Hat das (Gebäude) geöffnet?",
     "Hat das (Gebäude) (Time) geöffnet?",
