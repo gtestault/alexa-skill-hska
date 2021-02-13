@@ -8,7 +8,7 @@ module.exports = ErrorHandler = {
         console.error(error)
 
         return handlerInput.responseBuilder
-            .speak('Es ist ein Fehler aufgetretten, bitte versuchen Sie Ihre Anfrage nochmal später.')
+            .speak('Es ist ein Fehler aufgetreten, bitte versuchen Sie Ihre Anfrage nochmal später.')
             .withShouldEndSession(true)
             .getResponse();
     }
