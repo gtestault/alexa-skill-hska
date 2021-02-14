@@ -72,6 +72,7 @@ exports.NewsIntentHandler = {
         let speechText = escapeForSSML(content)
         return handlerInput.responseBuilder
             .speak(speechText)
+            .withShouldEndSession(true)
             .getResponse();
     }
 };
