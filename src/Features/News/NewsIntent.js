@@ -66,7 +66,7 @@ exports.NewsIntentHandler = {
             && handlerInput.requestEnvelope.request.dialogState === "COMPLETED";
     },
     async handle(handlerInput) {
-        let selectedNewsIndex = handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.value
+        let selectedNewsIndex = handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.resolutions.resolutionsPerAuthority[0].values[0].value.name
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const content = sessionAttributes.news[parseInt(selectedNewsIndex, 10) - 1].content
         let speechText = escapeForSSML(content)
