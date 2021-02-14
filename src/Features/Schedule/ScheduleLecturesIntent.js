@@ -96,7 +96,7 @@ const getScheduleInfo = (courseId, semesterId, groupsId, date) => {
                                 let lectureName = body.timetables[date].entries[i].lectureName
                                 start = utils.convertValueToHour(body.timetables[date].entries[i].startTime)
                                 if (found > 0) {
-                                    responseSpeach = responseSpeach + ". <break time="1s"/>"
+                                    responseSpeach = responseSpeach + `<break time="1s"/>`
                                 }
                                 found = found + 1
                                 responseSpeach = responseSpeach + lectureName + " um " + start
