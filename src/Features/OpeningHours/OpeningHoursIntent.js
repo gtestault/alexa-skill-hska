@@ -50,6 +50,7 @@ const OpeningHoursHandler = {
         console.log(`TEXT TO SPEAK: '${response}'`);
         return handlerInput.responseBuilder
             .speak(response)
+            .reprompt()
             .getResponse();
     }
 };
