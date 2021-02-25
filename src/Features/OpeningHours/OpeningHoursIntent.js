@@ -1,16 +1,15 @@
 const Alexa = require("ask-sdk");
 const https = require("https");
-const { off } = require("process");
 
 const requestURI = 'https://www.iwi.hs-karlsruhe.de/hskampus-broker/api/';
 const weekdays = [
-    { Day: 'Montag', Short: 'Mo' },
-    { Day: 'Dienstag', Short: 'Di' },
-    { Day: 'Mittwoch', Short: 'Mi' },
-    { Day: 'Donnerstag', Short: 'Do' },
-    { Day: 'Freitag', Short: 'Fr' },
-    { Day: 'Samstag', Short: 'Sa' },
-    { Day: 'Sonntag', Short: 'So' },
+    { Day: 'Montag', Short: 'Mo', Index: 1 },
+    { Day: 'Dienstag', Short: 'Di', Index: 2 },
+    { Day: 'Mittwoch', Short: 'Mi', Index: 3 },
+    { Day: 'Donnerstag', Short: 'Do', Index: 4 },
+    { Day: 'Freitag', Short: 'Fr', Index: 5 },
+    { Day: 'Samstag', Short: 'Sa', Index: 6 },
+    { Day: 'Sonntag', Short: 'So', Index: 0 },
 ];
 
 
@@ -31,7 +30,6 @@ const OpeningHoursHandler = {
 
         let article = slotValues.article.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value.name;
         article = article ? article : "";
-
 
         let poi;
         poi = office && !poi ? slotValues.office.slotValue.resolutions.resolutionsPerAuthority[0].values[0].value : poi;
@@ -107,7 +105,7 @@ const handleOpeningHours = (poi, learningPlace) => {
                     isSequence = true;
 
                     if (next.Day == convertedOpeningHours[convertedOpeningHours.length - 1].Day) {
-                        textArr.push(start.Day + " bis " + convertedOpeningHours[j+1].Day + " von "
+                        textArr.push(start.Day + " bis " + convertedOpeningHours[j + 1].Day + " von "
                             + start.Opens + " bis " + start.Closes + " Uhr");
                         i = j;
                     }
@@ -140,10 +138,6 @@ const handleOpeningHours = (poi, learningPlace) => {
     })
 }
 
-
-// extra slot (article) und dann slot übernehmen
-// (Fehler abfangen)
-// Learningplaces
 const handleBuildingOpened = (poi, date, learningPlace) => {
     return new Promise((resolve, reject) => {
         const append = handleDate(date);
@@ -153,7 +147,7 @@ const handleBuildingOpened = (poi, date, learningPlace) => {
 
         dayIndex = newDate.getDay() - 1 == -1 ? 6 : newDate.getDay() - 1;
 
-        isOpened = convertedOpeningHours[dayIndex].Opens;
+        isOpened = convertedOpeningHours[dayIndex] && convertedOpeningHours[dayIndex].Opens;
 
         let textAppend;
         if (isOpened) {
@@ -168,11 +162,11 @@ const handleBuildingOpened = (poi, date, learningPlace) => {
 function convertOpeningHours(openingHours, reject) {
     if (openingHours) {
         const splitted = splitString(openingHours);
-        const convertedWeekdays = weekdays;
+        let convDays = [];
 
         for (let i = 0; i < splitted.length; i++) {
 
-            // Is weekday
+            // Is day
             if (!weekdays.find(x => splitted[i].includes(x.Short))) {
                 continue;
             }
@@ -185,7 +179,7 @@ function convertOpeningHours(openingHours, reject) {
                     const obj = weekdays[index];
                     obj.Opens = splitted[i + 3];
                     obj.Closes = splitted[i + 5];
-                    convertedWeekdays[index] = obj;
+                    convDays.push(obj);
                     if (sequenceEnd.includes(weekdays[index].Short)) {
                         break;
                     }
@@ -199,11 +193,11 @@ function convertOpeningHours(openingHours, reject) {
                     const obj = weekdays[index];
                     obj.Opens = splitted[i + 1];
                     obj.Closes = splitted[i + 3];
-                    convertedWeekdays[index] = obj;
+                    convDays.push(obj);
                 }
             }
         }
-        return convertedWeekdays;
+        return convDays;
     } else {
         reject("Es konnten leider keine Öffnungszeiten ermittelt werden.");
     }
@@ -224,19 +218,31 @@ function splitString(openingHours) {
             i--;
         }
     }
-
     return splitted;
 }
 
 function handleDate(date) {
-    switch (date) {
-        case 'morgen':
-            return 1;
-        case 'übermorgen':
-            return 2
-        default:
-            return 0;
+    if (date) {
+        const found = weekdays.find(x => date.toUpperCase(date).includes(x.Day.toUpperCase()));
+        if (found) {
+            const diff = new Date().getDay() - found.Index;
+            if (diff > 0) {
+                return 7 - diff;
+            } else {
+                return Math.abs(diff);
+            }
+        } else {
+            switch (date) {
+                case 'morgen':
+                    return 1;
+                case 'übermorgen':
+                    return 2;
+                default:
+                    return 0;
+            }
+        }
     }
+    return 0;
 }
 
 module.exports = OpeningHoursHandler
