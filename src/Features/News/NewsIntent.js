@@ -66,13 +66,27 @@ exports.NewsIntentHandler = {
             && handlerInput.requestEnvelope.request.dialogState === "COMPLETED";
     },
     async handle(handlerInput) {
-        let selectedNewsIndex = handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.resolutions.resolutionsPerAuthority[0].values[0].value.name
+        let selectedNewsIndex = parseInt(handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.resolutions.resolutionsPerAuthority[0].values[0].value.name, 10)
+
+        if (selectedNewsIndex === 0) {
+            return handlerInput.responseBuilder
+                .speak("Okay")
+                .withShouldEndSession(true)
+                .reprompt()
+        }
+        if (selectedNewsIndex > sessionAttributes.news.length || selectedNewsIndex < 0) {
+            return handlerInput.responseBuilder
+                .speak("Die gewählte Meldung gibt es nicht.")
+                .withShouldEndSession(true)
+                .reprompt()
+        }
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        const content = sessionAttributes.news[parseInt(selectedNewsIndex, 10) - 1].content
+        const content = sessionAttributes.news[selectedNewsIndex - 1].content
         let speechText = escapeForSSML(content)
         return handlerInput.responseBuilder
             .speak(speechText)
             .withShouldEndSession(true)
+            .reprompt()
             .getResponse();
     }
 };
@@ -99,7 +113,7 @@ const getNews = async (courseOfStudiesId, requestedDate, handlerInput) => {
         }
 
         if (relevantNews.length === 1) {
-            return `Es gibt eine neue Meldung mit dem Titel: ${body[0]['title']} <break time="1s"/> ${body[0]['content']}.`
+            return `Es gibt eine neue Meldung mit dem Titel: ${relevantNews[0]['title']} <break time="1s"/> ${relevantNews[0]['content']}.`
         }
 
         responseSpeach += `Es gibt neue Meldungen mit den folgenden Titeln:`
