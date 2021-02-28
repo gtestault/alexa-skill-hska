@@ -55,7 +55,11 @@ const getRequestedDate = (handlerInput) => {
 }
 
 const getServerAddress = () => {
-    return MockServerFactory.getInstance().getServerAddress()
+    if (process.env.MOCK_SERVER) {
+        return MockServerFactory.getInstance().getServerAddress()
+    } else {
+        return "https://www.iwi.hs-karlsruhe.de"
+    }
 }
 
 
