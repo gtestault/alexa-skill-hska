@@ -41,6 +41,7 @@ exports.ListNewsIntentHandler = {
         }
         const courseOfStudiesId = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority[0].values[0].value.name
         let requestedDate = slotValues.DATES.value || dateFormat(new Date(), "yyyy-mm-dd")
+        requestedDate = dateFormat(new Date("2021-02-08"), "yyyy-mm-dd")
         //console.log(requestedDate)
         if (!requestedDate) {
             throw Error("news intent: no date value was resolved")
@@ -66,21 +67,18 @@ exports.NewsIntentHandler = {
             && handlerInput.requestEnvelope.request.dialogState === "COMPLETED";
     },
     async handle(handlerInput) {
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         let selectedNewsIndex = parseInt(handlerInput.requestEnvelope.request.intent.slots.NEWS_SELECTION.resolutions.resolutionsPerAuthority[0].values[0].value.name, 10)
-
         if (selectedNewsIndex === 0) {
             return handlerInput.responseBuilder
                 .speak("Okay")
-                .withShouldEndSession(true)
                 .reprompt()
         }
         if (selectedNewsIndex > sessionAttributes.news.length || selectedNewsIndex < 0) {
             return handlerInput.responseBuilder
                 .speak("Die gewählte Meldung gibt es nicht.")
-                .withShouldEndSession(true)
                 .reprompt()
         }
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const content = sessionAttributes.news[selectedNewsIndex - 1].content
         let speechText = escapeForSSML(content)
         return handlerInput.responseBuilder
