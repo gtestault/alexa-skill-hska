@@ -71,14 +71,15 @@ const loadCanteenData = async (canteenId, requestedDate) => {
     }
     const body = JSON.parse(res.body);
     if (!body || body.length === 0) {
-        throw new Error(`canteen intent: http: client: unexpected response structure, received following data: ${body}`)
+        throw new Error(`canteen intent: http client: empty body ${res.statusCode}`)
     }
     return body[0]
 }
 
 const getCanteenInfo = async (canteenId, requestedDate, vegiOnly) => {
+    let responseSpeach = ""
     const canteen = await loadCanteenData(canteenId, requestedDate)
-    if (!isCanteenOpen(canteen)) {
+    if (canteen == null || !isCanteenOpen(canteen)) {
         responseSpeach = "Diese Mensa hat leider an diesem Tag zu."
         return responseSpeach
     }
