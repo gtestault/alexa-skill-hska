@@ -41,7 +41,6 @@ exports.ListNewsIntentHandler = {
         }
         const courseOfStudiesId = slotValues.COURSE_OF_STUDIES.resolutions.resolutionsPerAuthority[0].values[0].value.name
         let requestedDate = slotValues.DATES.value || dateFormat(new Date(), "yyyy-mm-dd")
-        requestedDate = dateFormat(new Date("2021-02-08"), "yyyy-mm-dd")
         //console.log(requestedDate)
         if (!requestedDate) {
             throw Error("news intent: no date value was resolved")
