@@ -1,3 +1,7 @@
+const {randomElement} = require("../utils/HelperFunctions");
+const {getCustomIntents} = require("../utils/HelperFunctions");
+const {getSampleUtterance} = require("../utils/HelperFunctions");
+const sampleQuestions = require("../../sampleQuestions")
 module.exports = AMAZON_HelpIntent_Handler = {
     canHandle(handlerInput) {
         const request = handlerInput.requestEnvelope.request;
@@ -8,10 +12,7 @@ module.exports = AMAZON_HelpIntent_Handler = {
         const responseBuilder = handlerInput.responseBuilder;
         let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
-        let intents = getCustomIntents();
-        let sampleIntent = randomElement(intents);
-
-        let say = 'You asked for help. ';
+        let say = 'Du hast nach Hilfe gefragt. ';
 
         // let previousIntent = getPreviousIntent(sessionAttributes);
         // if (previousIntent && !handlerInput.requestEnvelope.session.new) {
@@ -19,11 +20,10 @@ module.exports = AMAZON_HelpIntent_Handler = {
         // }
         // say +=  'I understand  ' + intents.length + ' intents, '
 
-        say += ' Here something you can ask me, ' + getSampleUtterance(sampleIntent);
+        say += ' Hier ist etwas was du mich fragen kannst: <break time="1s"/>' + getSampleUtterance(sampleQuestions);
 
         return responseBuilder
             .speak(say)
-            .reprompt('try again, ' + say)
             .getResponse();
     },
 };

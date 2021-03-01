@@ -74,15 +74,15 @@ const getScheduleInfo = (courseId, semesterId, groupsId, date) => {
                     if (date == 7) {            // heute -> wochentag
                         date = (today.getDay() + 6) % 7
                         day = true
-                        responseSpeach = "Heute findet "
+                        responseSpeach = "Heute finden noch folgende Vorlesungen statt: "
                     } else if (date == 8) {     // morgen -> wochentag
                         date = (today.getDay() + 7) % 7
-                        responseSpeach = "Morgen findet "
+                        responseSpeach = "Morgen finden folgende Vorlesungen statt: "
                     } else if (date == 9) {     // übermorgen -> wochentag
                         date = (today.getDay() + 8) % 7
-                        responseSpeach = "Übermorgen findet "
+                        responseSpeach = "Übermorgen finden folgende Vorlesungen statt: "
                     } else {
-                        responseSpeach = "Am " + utils.convertValueToDay(date) + " findet "
+                        responseSpeach = "Am " + utils.convertValueToDay(date) + " finden folgende Vorlesungen statt: "
                     }
 
                     let nextDate = new Date()
@@ -96,7 +96,7 @@ const getScheduleInfo = (courseId, semesterId, groupsId, date) => {
                                 let lectureName = body.timetables[date].entries[i].lectureName
                                 start = utils.convertValueToHour(body.timetables[date].entries[i].startTime)
                                 if (found > 0) {
-                                    responseSpeach = responseSpeach + ", und "
+                                    responseSpeach = responseSpeach + `<break time="1s"/>`
                                 }
                                 found = found + 1
                                 responseSpeach = responseSpeach + lectureName + " um " + start
@@ -104,7 +104,6 @@ const getScheduleInfo = (courseId, semesterId, groupsId, date) => {
                         }
                         i++
                     }
-                    responseSpeach = responseSpeach + " statt"
                     if (found == 0){
                         responseSpeach = "Es konnte keine Vorlesung in den nächsten 7 Tagen gefunden werden"
                     }

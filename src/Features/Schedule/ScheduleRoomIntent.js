@@ -159,4 +159,3 @@ const getScheduleInfo = (courseId, groupsId, lectureId, date) => {
 }
 
 module.exports = ScheduleRoomIntentHandler
-

@@ -5,11 +5,11 @@ module.exports = ErrorHandler = {
     handle(handlerInput, error) {
         const request = handlerInput.requestEnvelope.request;
         console.log(`Error handled: ${error.message}`);
-        // console.log(`Original Request was: ${JSON.stringify(request, null, 2)}`);
+        console.error(error)
 
         return handlerInput.responseBuilder
-            .speak('Sorry, an error occurred.  Please say again.')
-            .reprompt('Sorry, an error occurred.  Please say again.')
+            .speak('Es ist ein Fehler aufgetreten, bitte versuchen Sie Ihre Anfrage nochmal später.')
+            .withShouldEndSession(true)
             .getResponse();
     }
 };

@@ -30,7 +30,7 @@ const buildResponseSpeech = (day, start, end, room, comment) => {
 }
 
 const buildDay = (day) => {
-    if (day
+    if (day == -1
     ) {
         hasMissingInformation--;
     } else {

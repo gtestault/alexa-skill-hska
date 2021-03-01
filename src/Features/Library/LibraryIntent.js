@@ -3,7 +3,7 @@ const https = require("https");
 const utils = require("../../Default/utils/Utils.js")
 
 const LibraryIntentHandler = {
-    //identify the request for the right intent and return true, if it is libraryintent
+    //identify the request for the right intent and return true, if it is LibraryIntent
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'LibraryIntent';
@@ -51,11 +51,24 @@ const getFreeSeats = (library) => {
                     console.log(`Data received: ${JSON.stringify(body)}`);
                     //take availableSeats of json structure
                     //go into location and then to availableSeats
-                    let freeSeats = body['location'][0]['availableSeats'];
+                    let totalSeats = body['location'][0]['availableSeats'];
+                    let nameOfBib = body['location'][0]['longName'];
+                    let freeSeats = body['seatestimate'][1]['freeSeats'];
                     console.log("Free seats: " + freeSeats);
-                    responseSpeech = "In der Bibliothek sind " + freeSeats + " Plätze frei."
+
+                    if (freeSeats == "" || freeSeats == undefined || freeSeats == null) {
+                        responseSpeech = "Die freien Plätze können nicht ausgegeben werden."
+                    } else if (freeSeats == 1) {
+                        responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon ist " + freeSeats + " frei."
+                    } else if (freeSeats == 0) {
+                        responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind keine Plätze frei."
+                    } else if (freeSeats == totalSeats) {
+                        responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind alle Plätze frei."
+                    }else {
+                        responseSpeech = "In der " + nameOfBib + " gibt es insgesamt " + totalSeats + " Plätze. Davon sind " + freeSeats + " frei."
+                    }
                 } else {
-                    responseSpeech = "Die Bibliothek konnte nicht gefunden werden oder der Eintrag ist nicht in der Datenbank. Bitte wiederholen Sie Ihre Anfrage.";
+                    responseSpeech = "Die " + nameOfBib + " konnte nicht gefunden werden oder der Eintrag ist nicht in der Datenbank. Bitte wiederholen Sie Ihre Anfrage.";
                 }
                 resolve(responseSpeech);
             });

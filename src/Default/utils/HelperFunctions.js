@@ -1,4 +1,6 @@
-module.exports = {
+const model = require("../../model");
+
+const utils = {
 
     capitalize(myString) {
 
@@ -12,6 +14,9 @@ module.exports = {
     },
 
     stripSpeak(str) {
+        if (!str) {
+            return ""
+        }
         return (str.replace('<speak>', '').replace('</speak>', ''));
     },
 
@@ -136,9 +141,9 @@ module.exports = {
         return customIntents;
     },
 
-    getSampleUtterance(intent) {
+    getSampleUtterance(sampleUterrances) {
 
-        return randomElement(intent.samples);
+        return this.randomElement(sampleUterrances);
 
     },
 
@@ -162,6 +167,14 @@ module.exports = {
             return false;
         }
 
+    },
+
+    emphasisSSML(text) {
+        return `<emphasis level="moderate">${text}</emphasis>`
+    },
+
+    escapeForSSML(text) {
+        return text.replace(/&/g, " und ");
     },
 
     timeDelta(t1, t2) {
@@ -188,3 +201,8 @@ module.exports = {
         return span;
     }
 }
+
+utils.getSampleUtterance = utils.getSampleUtterance.bind(utils)
+module.exports = utils
+
+
