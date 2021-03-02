@@ -43,7 +43,7 @@ const ScheduleLecturesIntentHandler = {
         console.log(`TEXT TO SPEAK: ${responseSpeach}`);
         return handlerInput.responseBuilder
             .speak(responseSpeach)
-            .reprompt('add a reprompt if you want to keep the session open for the user to respond')
+            .reprompt()
             .getResponse();
     }
 };
